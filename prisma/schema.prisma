@@ -1,0 +1,53 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  content   String
+  role      String   // 'user' or 'assistant'
+  userId    String   @default("default")
+  action    String?  // 'connect', 'send', 'balance', etc.
+  params    String?  // JSON string of extracted parameters
+  createdAt DateTime @default(now())
+}
+
+model Transaction {
+  id            String   @id @default(cuid())
+  walletAddress String   // User's wallet address
+  type          String   // 'send', 'receive', 'bridge', 'swap'
+  fromChain     String?  // Source chain
+  toChain       String?  // Destination chain
+  token         String   // Token symbol (SOL, ETH, etc.)
+  amount        String   // Amount as string
+  fromAddress   String?  // Sender address
+  toAddress     String?  // Recipient address
+  txHash        String?  // Transaction hash
+  status        String   @default("pending") // 'pending', 'completed', 'failed'
+  bridgeTxId    String?  // Bridge transaction ID
+  protocol      String?  // Bridge protocol used
+  fee           String?  // Transaction fee
+  blockNumber   String?  // Block number
+  gasUsed       String?  // Gas used
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Wallet {
+  id        String   @id @default(cuid())
+  address   String   @unique
+  userId    String   @default("default")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  transactions Transaction[]
+}
