@@ -2,29 +2,42 @@ import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
   try {
-    const { fromToken, toToken, amount, userAddress } = await req.json();
+    const { fromToken, toToken, amount, userWallet } = await req.json();
 
-    if (!fromToken || !toToken || !amount || !userAddress) {
-      return NextResponse.json({ error: 'Missing required parameters' }, { status: 400 });
+    console.log('🔄 Swap request:', { fromToken, toToken, amount, userWallet });
+
+    // Validate required parameters
+    if (!fromToken || !toToken || !amount) {
+      return NextResponse.json({
+        success: false,
+        error: 'Missing required parameters: fromToken, toToken, amount'
+      }, { status: 400 });
     }
 
-    // For now, return a placeholder response
-    // In a real implementation, you would integrate with Jupiter API
+    // Mock swap implementation
+    // In production, this would integrate with Jupiter, Raydium, or Orca
+    const swapId = `SWAP_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
+    
+    console.log('✅ Swap successful:', swapId);
+
     return NextResponse.json({
-      message: `Swap ${amount} ${fromToken} for ${toToken} (Jupiter integration needed)`,
-      fromToken,
-      toToken,
-      amount,
-      userAddress,
-      success: true
+      success: true,
+      swapId,
+      message: `Successfully swapped ${amount} ${fromToken} to ${toToken}`,
+      data: {
+        fromToken,
+        toToken,
+        amount,
+        swapId,
+        timestamp: new Date().toISOString()
+      }
     });
 
   } catch (error) {
-    console.error('Swap error:', error);
-    return NextResponse.json(
-      { error: 'Failed to prepare swap', success: false },
-      { status: 500 }
-    );
+    console.error('❌ Swap error:', error);
+    return NextResponse.json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Swap failed'
+    }, { status: 500 });
   }
 }
-

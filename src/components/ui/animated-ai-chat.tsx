@@ -166,7 +166,7 @@ export function AnimatedAIChat() {
     const [messages, setMessages] = useState<Array<{role: string, content: string}>>([]);
     const [balance, setBalance] = useState<number | null>(null);
     const [isProcessing, setIsProcessing] = useState(false);
-    const [pendingAction, setPendingAction] = useState<{type: string, params: {amount: string | number, to?: string, domain?: string, fromChain?: string, toChain?: string, token?: string, toAddress?: string}} | null>(null);
+    const [pendingAction, setPendingAction] = useState<{type: string, params: {amount: string | number, to?: string, domain?: string, fromChain?: string, toChain?: string, token?: string, toAddress?: string, fromToken?: string, toToken?: string}} | null>(null);
     const [showApproval, setShowApproval] = useState(false);
     const { textareaRef, adjustHeight } = useAutoResizeTextarea({
         minHeight: 60,
@@ -574,6 +574,44 @@ export function AnimatedAIChat() {
         }
     }, [publicKey]);
 
+    const executeSwapTransaction = useCallback(async (transactionData: {amount: string | number, fromToken: string, toToken: string}) => {
+        try {
+            setIsTyping(true);
+            
+            const response = await fetch('/api/solana/swap', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    fromToken: transactionData.fromToken,
+                    toToken: transactionData.toToken,
+                    amount: transactionData.amount,
+                    userWallet: publicKey?.toString()
+                })
+            });
+
+            const result = await response.json();
+            
+            if (result.success) {
+                setMessages(prev => [...prev, {
+                    role: 'assistant',
+                    content: `✅ ${result.message}\n\nSwap ID: ${result.swapId}`
+                }]);
+            } else {
+                setMessages(prev => [...prev, {
+                    role: 'assistant',
+                    content: `❌ Swap failed: ${result.error || result.message}`
+                }]);
+            }
+        } catch (error) {
+            setMessages(prev => [...prev, {
+                role: 'assistant',
+                content: `❌ Swap execution failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+            }]);
+        } finally {
+            setIsTyping(false);
+        }
+    }, [publicKey]);
+
     // Make executeBridgeTransaction available globally for onclick
     useEffect(() => {
         (window as {executeBridgeTransaction?: (data: {fromChain: string, toChain: string, amount: string | number, token: string, toAddress: string}) => Promise<void>}).executeBridgeTransaction = executeBridgeTransaction;
@@ -605,6 +643,17 @@ export function AnimatedAIChat() {
         setShowApproval(true);
     };
 
+    const handleSwapWithProcessing = async (params: {amount: string | number, fromToken: string, toToken: string}) => {
+        setIsProcessing(true);
+        setPendingAction({ type: 'swap', params });
+        
+        // Simulate processing time
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        setIsProcessing(false);
+        setShowApproval(true);
+    };
+
     const handleApproval = async () => {
         if (!pendingAction) return;
         
@@ -622,6 +671,13 @@ export function AnimatedAIChat() {
                 await executeBridgeTransaction(pendingAction.params as {fromChain: string, toChain: string, amount: string | number, token: string, toAddress: string});
             } else {
                 console.error('Missing required bridge parameters');
+                return;
+            }
+        } else if (pendingAction.type === 'swap') {
+            if (pendingAction.params.fromToken && pendingAction.params.toToken) {
+                await executeSwapTransaction(pendingAction.params as {amount: string | number, fromToken: string, toToken: string});
+            } else {
+                console.error('Missing required swap parameters');
                 return;
             }
         }
@@ -820,6 +876,8 @@ export function AnimatedAIChat() {
                          await handleSendSOLWithProcessing(data.params);
                      } else if (data.action === 'bridge' && data.params) {
                          await handleBridgeTransactionWithProcessing(data.params);
+                     } else if (data.action === 'swap' && data.params) {
+                         await handleSwapWithProcessing(data.params);
                      } else if (data.action === 'history' && publicKey) {
                          try {
                              const historyResponse = await fetch(`/api/transactions/simple-history?walletAddress=${publicKey.toString()}&limit=20`);
@@ -1098,6 +1156,25 @@ ${new Date(tx.createdAt).toLocaleString()}
                                         <span className="text-purple-400 font-mono text-sm">
                                             {pendingAction.params.toAddress?.slice(0, 8)}...{pendingAction.params.toAddress?.slice(-8)}
                                         </span>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {pendingAction.type === 'swap' && (
+                            <div className="space-y-4">
+                                <div className="bg-gray-700/50 rounded-lg p-4">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <span className="text-gray-300">Amount</span>
+                                        <span className="text-white font-semibold">{pendingAction.params.amount} {pendingAction.params.fromToken}</span>
+                                    </div>
+                                    <div className="flex items-center justify-between mb-2">
+                                        <span className="text-gray-300">From</span>
+                                        <span className="text-green-400">{pendingAction.params.fromToken}</span>
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-gray-300">To</span>
+                                        <span className="text-blue-400">{pendingAction.params.toToken}</span>
                                     </div>
                                 </div>
                             </div>
