@@ -14,7 +14,7 @@ import {
     FileText,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import Waves from "@/components/ui/waves-background";
+import { Waves } from "@/components/ui/waves-background";
 import * as React from "react"
 import Image from "next/image";
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';

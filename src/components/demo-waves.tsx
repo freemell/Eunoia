@@ -1,4 +1,4 @@
-import Waves from "@/components/ui/waves-background"
+import { Waves } from "@/components/ui/waves-background"
 
 function WavesDemo() {
   return (
