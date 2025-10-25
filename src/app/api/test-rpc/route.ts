@@ -28,12 +28,13 @@ export async function GET() {
       });
       console.log(`✅ ${rpcUrl} - Slot: ${slot}`);
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       results.push({
         url: rpcUrl,
         status: 'failed',
-        error: error.message
+        error: errorMessage
       });
-      console.log(`❌ ${rpcUrl} - Error: ${error.message}`);
+      console.log(`❌ ${rpcUrl} - Error: ${errorMessage}`);
     }
   }
 
