@@ -14,7 +14,7 @@ import {
     FileText,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Waves } from "@/components/ui/waves-background";
+import Waves from "@/components/ui/waves-background";
 import * as React from "react"
 import Image from "next/image";
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
@@ -196,7 +196,7 @@ export function AnimatedAIChat() {
     useEffect(() => {
         const checkMobile = () => {
             const userAgent = navigator.userAgent || navigator.vendor || (window as {opera?: string}).opera;
-            return /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
+            return /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent || '');
         };
         setIsMobile(checkMobile());
         
@@ -314,14 +314,14 @@ export function AnimatedAIChat() {
             console.log('✅ Wallet connected successfully!');
         } catch (error: unknown) {
             console.error('❌ DEEP CONNECTION ERROR ANALYSIS:', {
-                message: error?.message,
-                name: error?.name,
-                code: error?.code,
-                stack: error?.stack,
+                message: error instanceof Error ? error.message : 'Unknown error',
+                name: error instanceof Error ? error.name : 'Unknown',
+                code: (error as { code?: string }).code,
+                stack: error instanceof Error ? error.stack : undefined,
                 wallet: wallet?.adapter?.name,
                 readyState: wallet?.adapter?.readyState,
-                cause: error?.cause,
-                reason: error?.reason
+                cause: (error as { cause?: unknown }).cause,
+                reason: (error as { reason?: string }).reason
             });
             
             // Enhanced error handling with specific troubleshooting steps
@@ -371,7 +371,7 @@ export function AnimatedAIChat() {
             // Clear error after 12 seconds to give user time to read
             setTimeout(() => setWalletError(null), 12000);
         }
-    }, [wallet, connect, isMobile, handleMobileWalletConnect, connecting]);
+    }, [wallet, connect, isMobile, handleMobileWalletConnect, connecting, clearError]);
     
     // Handle wallet connection errors from the provider
     useEffect(() => {
@@ -389,7 +389,7 @@ export function AnimatedAIChat() {
                 'WalletNotSelected': 'No wallet selected. Please select a wallet first.',
             };
             
-            const errorCode = error?.code || error?.name || 'Unknown';
+            const errorCode = (error as { code?: string }).code || (error instanceof Error ? error.name : 'Unknown');
             const message = errorMessages[errorCode] || 'Wallet connection failed. Please try again.';
             
             setWalletError(message);
@@ -403,32 +403,6 @@ export function AnimatedAIChat() {
         return () => window.removeEventListener('wallet-error', handleWalletError);
     }, []);
     
-    // Create a more reliable connection with fallback
-    const getReliableConnection = useCallback(async () => {
-        const rpcEndpoints = [
-            'https://api.mainnet-beta.solana.com',
-            'https://solana-api.projectserum.com',
-            'https://solana.public-rpc.com'
-        ];
-        
-        for (const endpoint of rpcEndpoints) {
-            try {
-                const { Connection } = await import('@solana/web3.js');
-                const testConnection = new Connection(endpoint, 'confirmed');
-                // Test with a simple call that doesn't require high permissions
-                await testConnection.getSlot();
-                console.log(`Using RPC endpoint: ${endpoint}`);
-                return testConnection;
-            } catch (error) {
-                console.log(`RPC endpoint ${endpoint} failed:`, error.message);
-                continue;
-            }
-        }
-        
-        // Fallback to the original connection
-        console.log('All RPC endpoints failed, using original connection');
-        return connection;
-    }, [connection]);
 
     useEffect(() => {
         if (connected && publicKey) {
@@ -563,7 +537,7 @@ export function AnimatedAIChat() {
     };
 
     // Bridge execution function
-    const executeBridgeTransaction = async (transactionData: {fromChain: string, toChain: string, amount: string | number, token: string, toAddress: string}) => {
+    const executeBridgeTransaction = useCallback(async (transactionData: {fromChain: string, toChain: string, amount: string | number, token: string, toAddress: string}) => {
         try {
             setIsTyping(true);
             
@@ -598,7 +572,7 @@ export function AnimatedAIChat() {
         } finally {
             setIsTyping(false);
         }
-    };
+    }, [publicKey]);
 
     // Make executeBridgeTransaction available globally for onclick
     useEffect(() => {
@@ -606,7 +580,7 @@ export function AnimatedAIChat() {
         return () => {
             delete (window as {executeBridgeTransaction?: (data: {fromChain: string, toChain: string, amount: string | number, token: string, toAddress: string}) => Promise<void>}).executeBridgeTransaction;
         };
-    }, [publicKey]);
+    }, [publicKey, executeBridgeTransaction]);
 
     // Processing functions with approval phase
     const handleSendSOLWithProcessing = async (params: {amount: string | number, to: string, domain?: string}) => {
@@ -637,9 +611,19 @@ export function AnimatedAIChat() {
         setShowApproval(false);
         
         if (pendingAction.type === 'send') {
-            await handleSendSOL(pendingAction.params);
+            if (pendingAction.params.to) {
+                await handleSendSOL(pendingAction.params as {amount: string | number, to: string, domain?: string});
+            } else {
+                console.error('Missing required parameter: to');
+                return;
+            }
         } else if (pendingAction.type === 'bridge') {
-            await handleBridgeTransaction(pendingAction.params);
+            if (pendingAction.params.fromChain && pendingAction.params.toChain && pendingAction.params.token && pendingAction.params.toAddress) {
+                await executeBridgeTransaction(pendingAction.params as {fromChain: string, toChain: string, amount: string | number, token: string, toAddress: string});
+            } else {
+                console.error('Missing required bridge parameters');
+                return;
+            }
         }
         
         setPendingAction(null);
@@ -736,7 +720,7 @@ export function AnimatedAIChat() {
             }
 
             const blockhash = blockhashData.blockhash;
-            const lamports = Math.floor(amount * LAMPORTS_PER_SOL);
+            const lamports = Math.floor(Number(amount) * LAMPORTS_PER_SOL);
 
             // Create transaction
             const transaction = new Transaction({
@@ -850,7 +834,7 @@ export function AnimatedAIChat() {
 <span style="color: #e5e7eb; font-size: 14px;">Total Transactions: <span style="color: #10b981; font-weight: 600;">${historyData.pagination.total}</span></span>
 <span style="color: #e5e7eb; font-size: 14px;">Wallet: <span style="color: #06b6d4; font-weight: 600;">${publicKey.toString().slice(0, 8)}...${publicKey.toString().slice(-8)}</span></span>
 </div>
-${transactions.map(tx => `
+                ${transactions.map((tx: { type: string; status: string; amount: string; timestamp: string; signature?: string; to?: string; fromChain?: string; toChain?: string; token?: string; toAddress?: string; txHash?: string; createdAt: string }) => `
 <div style="margin: 12px 0; padding: 12px; background: rgba(255, 255, 255, 0.03); border-radius: 6px; border-left: 3px solid ${tx.status === 'completed' ? '#10b981' : tx.status === 'failed' ? '#ef4444' : '#f59e0b'};">
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
 <span style="color: #e5e7eb; font-weight: 600; text-transform: capitalize;">${tx.type}</span>
@@ -899,7 +883,6 @@ ${new Date(tx.createdAt).toLocaleString()}
                              const balance = Math.floor(balanceData.balance * LAMPORTS_PER_SOL);
                              console.log('Got balance from API:', balanceData.balance, 'SOL');
 
-                            const solBalance = balance / LAMPORTS_PER_SOL;
 
                              // Calculate amount to send
                              let lamports;
@@ -993,7 +976,7 @@ ${new Date(tx.createdAt).toLocaleString()}
                                  if (txStatus.value?.err) {
                                      setMessages(prev => [...prev, {
                                          role: 'assistant',
-                                         content: `❌ Transaction failed: ${txStatus.value.err}. <a href="https://solscan.io/tx/${signature}" target="_blank" rel="noopener noreferrer" style="color: #3b82f6; text-decoration: underline;">Check tx</a>`
+                                         content: `❌ Transaction failed: ${txStatus.value?.err || 'Unknown error'}. <a href="https://solscan.io/tx/${signature}" target="_blank" rel="noopener noreferrer" style="color: #3b82f6; text-decoration: underline;">Check tx</a>`
                                      }]);
                                  } else {
                                      setMessages(prev => [...prev, {
@@ -1001,7 +984,7 @@ ${new Date(tx.createdAt).toLocaleString()}
                                          content: `✅ Transaction successful! <a href="https://solscan.io/tx/${signature}" target="_blank" rel="noopener noreferrer" style="color: #3b82f6; text-decoration: underline;">Check tx</a>`
                                      }]);
                                  }
-                             } catch (statusError) {
+                             } catch {
                                  // If we can't check status, just show the link
                                  setMessages(prev => [...prev, {
                                      role: 'assistant',
@@ -1013,14 +996,14 @@ ${new Date(tx.createdAt).toLocaleString()}
                              console.error('Send transaction error:', error);
                              let errorMessage = 'Transaction failed';
 
-                             if (error.message.includes('User rejected')) {
-                                 errorMessage = '❌ Transaction cancelled by user';
-                             } else if (error.message.includes('Insufficient funds')) {
-                                 errorMessage = `❌ ${error.message}`;
-                             } else if (error.message.includes('Failed to get balance')) {
+                            if (error instanceof Error && error.message.includes('User rejected')) {
+                                errorMessage = '❌ Transaction cancelled by user';
+                            } else if (error instanceof Error && error.message.includes('Insufficient funds')) {
+                                errorMessage = `❌ ${error.message}`;
+                             } else if (error instanceof Error && error.message.includes('Failed to get balance')) {
                                  errorMessage = `❌ Unable to check your balance. Please try again later. Error: ${error.message}`;
                              } else {
-                                 errorMessage = `❌ Transaction failed: ${error.message}`;
+                                 errorMessage = `❌ Transaction failed: ${error instanceof Error ? error.message : 'Unknown error'}`;
                              }
 
                              setMessages(prev => [...prev, {
@@ -1155,7 +1138,6 @@ ${new Date(tx.createdAt).toLocaleString()}
                 waveAmpY={15}
                 friction={0.95}
                 tension={0.008}
-                maxCursorMove={80}
                 xGap={15}
                 yGap={40}
             />
@@ -1286,9 +1268,11 @@ ${new Date(tx.createdAt).toLocaleString()}
                                             whileTap={{ scale: 0.95 }}
                                             data-command-button
                                         >
-                                            <img 
+                                            <Image 
                                                 src="/merlin-logo.png" 
                                                 alt="Merlin" 
+                                                width={24}
+                                                height={24}
                                                 className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity"
                                             />
                                         </motion.button>
@@ -1436,9 +1420,11 @@ ${new Date(tx.createdAt).toLocaleString()}
                                     whileTap={{ scale: 0.95 }}
                                     data-command-button
                                 >
-                                    <img 
+                                    <Image 
                                         src="/merlin-logo.png" 
                                         alt="Merlin" 
+                                        width={24}
+                                        height={24}
                                         className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity"
                                     />
                                 </motion.button>

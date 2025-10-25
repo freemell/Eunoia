@@ -7,8 +7,6 @@ import {
   CoinbaseWalletAdapter,
   NightlyWalletAdapter
 } from '@solana/wallet-adapter-wallets';
-// @ts-expect-error - Mobile wallet adapter has type declaration issues
-import { SolanaMobileWalletAdapter, createDefaultAuthorizationResultCache } from '@solana-mobile/wallet-adapter-mobile';
 import { useMemo, useCallback, useState, createContext, useContext } from 'react';
 import { WalletError } from '@solana/wallet-adapter-base';
 
@@ -46,25 +44,9 @@ export function MerlinWalletProvider({ children }: { children: React.ReactNode }
       
       const walletAdapters = [
         // Only include wallets that don't auto-detect via Wallet Standard
-        new SolflareWalletAdapter({
-          network: 'mainnet-beta'
-        }),
-        new CoinbaseWalletAdapter({
-          network: 'mainnet-beta'
-        }),
-        new NightlyWalletAdapter({
-          network: 'mainnet-beta'
-        }),
-        // Mobile wallet adapter for deep linking
-        new SolanaMobileWalletAdapter({
-          appIdentity: { 
-            name: 'Merlin App',
-            uri: 'https://merlin.app',
-            icon: '/merlin-logo.png'
-          },
-          authorizationResultCache: createDefaultAuthorizationResultCache(),
-          cluster: 'mainnet-beta'
-        }),
+        new SolflareWalletAdapter(),
+        new CoinbaseWalletAdapter(),
+        new NightlyWalletAdapter(),
       ];
 
       console.log('📱 Available wallet adapters:', walletAdapters.length);
@@ -98,18 +80,18 @@ export function MerlinWalletProvider({ children }: { children: React.ReactNode }
     // Deep error logging with all possible error properties
     console.error('🔴 DEEP WALLET ERROR ANALYSIS:', {
       // Primary error properties
-      code: error.code,
+      code: (error as { code?: string }).code,
       message: error.message,
       name: error.name,
       stack: error.stack,
       
       // Additional error properties that might exist
-      cause: error.cause,
-      reason: error.reason,
-      details: error.details,
+      cause: (error as { cause?: unknown }).cause,
+      reason: (error as { reason?: string }).reason,
+      details: (error as { details?: unknown }).details,
       
       // Nested error object
-      error: error.error,
+      error: (error as { error?: unknown }).error,
       
       // Timestamp for debugging
       timestamp: new Date().toISOString(),
@@ -136,13 +118,13 @@ export function MerlinWalletProvider({ children }: { children: React.ReactNode }
     
     // Check for common error patterns and provide specific solutions
     const errorMessage = error.message?.toLowerCase() || '';
-    const errorCode = error.code || '';
+    const errorCode = (error as { code?: string }).code || '';
     
     // Detect stale permissions (most common cause of "Unexpected error")
     const isStalePermissions = !errorMessage || 
                               errorMessage === 'unexpected error' || 
                               errorMessage === '' ||
-                              error.code === -32603 ||
+                              (error as { code?: number }).code === -32603 ||
                               (error as {data?: {code?: number}})?.data?.code === -32603;
     
     if (isStalePermissions) {

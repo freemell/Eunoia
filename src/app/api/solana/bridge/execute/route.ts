@@ -22,7 +22,6 @@ export async function POST(req: Request) {
       token: token || 'SOL',
       amount: amount || '0.01',
       toAddress: toAddress || '',
-      userWallet: userWallet || ''
     });
 
     if (bridgeResult.success) {

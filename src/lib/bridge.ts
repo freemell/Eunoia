@@ -13,28 +13,28 @@
 // import { EvmPlatform } from '@wormhole-foundation/sdk-evm';
 
 // Simplified chain mappings
-const CHAIN_MAPPINGS: Record<string, string> = {
-  'solana': 'Solana',
-  'ethereum': 'Ethereum',
-  'base': 'Base',
-  'polygon': 'Polygon',
-  'arbitrum': 'Arbitrum',
-  'optimism': 'Optimism',
-  'avalanche': 'Avalanche',
-  'bsc': 'Bsc'
-};
+// const CHAIN_MAPPINGS: Record<string, string> = {
+//   'solana': 'Solana',
+//   'ethereum': 'Ethereum',
+//   'base': 'Base',
+//   'polygon': 'Polygon',
+//   'arbitrum': 'Arbitrum',
+//   'optimism': 'Optimism',
+//   'avalanche': 'Avalanche',
+//   'bsc': 'Bsc'
+// };
 
 // Platform mappings
-const PLATFORM_MAPPINGS: Record<string, string> = {
-  'solana': 'Solana',
-  'ethereum': 'Ethereum',
-  'base': 'Ethereum',
-  'polygon': 'Ethereum',
-  'arbitrum': 'Ethereum',
-  'optimism': 'Ethereum',
-  'avalanche': 'Ethereum',
-  'bsc': 'Ethereum'
-};
+// const PLATFORM_MAPPINGS: Record<string, string> = {
+//   'solana': 'Solana',
+//   'ethereum': 'Ethereum',
+//   'base': 'Ethereum',
+//   'polygon': 'Ethereum',
+//   'arbitrum': 'Ethereum',
+//   'optimism': 'Ethereum',
+//   'avalanche': 'Ethereum',
+//   'bsc': 'Ethereum'
+// };
 
 export interface BridgeParams {
   fromChain: string;
@@ -42,7 +42,6 @@ export interface BridgeParams {
   token: string;
   amount: string | number;
   toAddress: string;
-  userWallet: string;
 }
 
 export interface BridgeResult {
@@ -60,7 +59,7 @@ export class MerlinBridge {
 
   async executeBridge(params: BridgeParams): Promise<BridgeResult> {
     try {
-      const { fromChain, toChain, token, amount, toAddress, userWallet } = params;
+      const { fromChain, toChain, token, amount, toAddress } = params;
 
       console.log('Executing bridge:', { fromChain, toChain, token, amount, toAddress });
 
@@ -95,7 +94,7 @@ export class MerlinBridge {
   }
 
   private async bridgeSolanaToEvm(params: BridgeParams): Promise<BridgeResult> {
-    const { amount, toAddress, userWallet } = params;
+    const { amount, toAddress } = params;
     
     try {
       // This is a simplified implementation
@@ -109,7 +108,7 @@ export class MerlinBridge {
       const bridgeTxId = `BRIDGE_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
       
       // Simulate bridge transaction
-      await this.simulateBridgeProcess(amount, toAddress);
+      await this.simulateBridgeProcess();
 
       return {
         success: true,
@@ -126,7 +125,7 @@ export class MerlinBridge {
     }
   }
 
-  private async simulateBridgeProcess(amount: string | number, toAddress: string): Promise<void> {
+  private async simulateBridgeProcess(): Promise<void> {
     // Simulate the time it takes for a bridge transaction
     const delay = Math.random() * 3000 + 2000; // 2-5 seconds
     await new Promise(resolve => setTimeout(resolve, delay));

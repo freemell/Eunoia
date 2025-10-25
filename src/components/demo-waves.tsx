@@ -1,4 +1,4 @@
-import { Waves } from "@/components/ui/waves-background"
+import Waves from "@/components/ui/waves-background"
 
 function WavesDemo() {
   return (
@@ -13,7 +13,6 @@ function WavesDemo() {
         waveAmpY={20}
         friction={0.9}
         tension={0.01}
-        maxCursorMove={120}
         xGap={12}
         yGap={36}
       />

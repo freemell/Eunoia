@@ -40,29 +40,6 @@ function getOptimalBridge(toChain: string) {
   }
 }
 
-// Calculate bridge fees and requirements
-function calculateBridgeRequirements(fromChain: string, toChain: string, token: string, amount: string) {
-  const protocol = getOptimalBridge(toChain);
-  
-  // Calculate actual bridge fee based on amount
-  let bridgeFee = 0.0005; // Base fee in SOL
-  if (amount === 'all') {
-    bridgeFee = 0.001; // Higher fee for full balance
-  } else if (amount === 'half') {
-    bridgeFee = 0.0007;
-  } else if (typeof amount === 'number' && amount > 10) {
-    bridgeFee = 0.0008; // Higher fee for large amounts
-  }
-
-  return {
-    protocol,
-    bridgeFee: `${bridgeFee} SOL`,
-    estimatedTime: protocol.time,
-    gasEstimate: `${bridgeFee * 1000} lamports`,
-    slippage: '0.5%',
-    minimumAmount: '0.001 SOL'
-  };
-}
 
 export async function POST(req: Request) {
   try {
@@ -97,8 +74,7 @@ export async function POST(req: Request) {
       toChain,
       token,
       amount,
-      toAddress,
-      userWallet
+      toAddress
     });
     
     // Generate bridge transaction data
