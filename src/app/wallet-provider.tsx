@@ -7,6 +7,7 @@ import {
   CoinbaseWalletAdapter,
   NightlyWalletAdapter
 } from '@solana/wallet-adapter-wallets';
+// @ts-ignore - Mobile wallet adapter has type declaration issues
 import { SolanaMobileWalletAdapter, createDefaultAuthorizationResultCache } from '@solana-mobile/wallet-adapter-mobile';
 import { useMemo, useCallback, useState, createContext, useContext } from 'react';
 import { WalletError } from '@solana/wallet-adapter-base';
