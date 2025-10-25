@@ -147,9 +147,16 @@ export default function Waves({
 
     function setSize() {
       if (!container || !canvas) return
-      boundingRef.current = container.getBoundingClientRect()
-      canvas.width = boundingRef.current.width
-      canvas.height = boundingRef.current.height
+      const rect = container.getBoundingClientRect()
+      boundingRef.current = rect
+      
+      // Set canvas size to match container
+      canvas.width = rect.width
+      canvas.height = rect.height
+      
+      // Ensure canvas fills the container
+      canvas.style.width = '100%'
+      canvas.style.height = '100%'
     }
 
     function initLines() {
@@ -221,17 +228,46 @@ export default function Waves({
       requestAnimationFrame(animate)
     }
 
+    // Initial setup
     setSize()
     initLines()
-    animate()
+    
+    // Start animation after a small delay to ensure proper initialization
+    const animationId = requestAnimationFrame(() => {
+      animate()
+    })
+
+    // Use ResizeObserver for better resize handling
+    const resizeObserver = new ResizeObserver(() => {
+      setSize()
+      initLines()
+    })
+    
+    if (container) {
+      resizeObserver.observe(container)
+    }
 
     window.addEventListener('resize', setSize)
-    return () => window.removeEventListener('resize', setSize)
+    return () => {
+      window.removeEventListener('resize', setSize)
+      resizeObserver.disconnect()
+      cancelAnimationFrame(animationId)
+    }
   }, [lineColor, backgroundColor, waveSpeedX, waveSpeedY, waveAmpX, waveAmpY, xGap, yGap, friction, tension])
 
   return (
-    <div ref={containerRef} className={className} style={{ width: '100%', height: '100%' }}>
-      <canvas ref={canvasRef} style={{ display: 'block' }} />
+    <div ref={containerRef} className={className} style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, zIndex: 0 }}>
+      <canvas 
+        ref={canvasRef} 
+        style={{ 
+          display: 'block', 
+          width: '100%', 
+          height: '100%',
+          position: 'absolute',
+          top: 0,
+          left: 0
+        }} 
+      />
     </div>
   )
 }
