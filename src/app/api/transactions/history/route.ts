@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 import { memoryDb } from '@/lib/memory-db';
 
 export async function GET(req: Request) {
@@ -13,36 +12,14 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: 'Wallet address is required' }, { status: 400 });
     }
 
-    let transactions, totalCount, wallet;
+    // Use memory database
+    const transactions = await memoryDb.findManyTransactions(
+      { walletAddress },
+      { orderBy: { createdAt: 'desc' }, take: limit, skip: offset }
+    );
 
-    try {
-      // Try Prisma first
-      transactions = await prisma.transaction.findMany({
-        where: { walletAddress },
-        orderBy: { createdAt: 'desc' },
-        take: limit,
-        skip: offset
-      });
-
-      totalCount = await prisma.transaction.count({
-        where: { walletAddress }
-      });
-
-      wallet = await prisma.wallet.findUnique({
-        where: { address: walletAddress }
-      });
-    } catch (prismaError) {
-      console.log('Prisma failed, using memory database:', prismaError);
-      
-      // Fallback to memory database
-      transactions = await memoryDb.findManyTransactions(
-        { walletAddress },
-        { orderBy: { createdAt: 'desc' }, take: limit, skip: offset }
-      );
-
-      totalCount = await memoryDb.countTransactions({ walletAddress });
-      wallet = await memoryDb.findUniqueWallet({ address: walletAddress });
-    }
+    const totalCount = await memoryDb.countTransactions({ walletAddress });
+    const wallet = await memoryDb.findUniqueWallet({ address: walletAddress });
 
     return NextResponse.json({
       success: true,

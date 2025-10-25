@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 import { memoryDb } from '@/lib/memory-db';
 
 export async function POST(req: Request) {
@@ -28,65 +27,29 @@ export async function POST(req: Request) {
       }, { status: 400 });
     }
 
-    let transaction;
+    // Use memory database
+    await memoryDb.upsertWallet({
+      address: walletAddress,
+      userId: 'default'
+    });
 
-    try {
-      // Try Prisma first
-      const wallet = await prisma.wallet.upsert({
-        where: { address: walletAddress },
-        update: {},
-        create: {
-          address: walletAddress,
-          userId: 'default'
-        }
-      });
-
-      transaction = await prisma.transaction.create({
-        data: {
-          walletAddress,
-          type,
-          fromChain,
-          toChain,
-          token,
-          amount,
-          fromAddress,
-          toAddress,
-          txHash,
-          status,
-          bridgeTxId,
-          protocol,
-          fee,
-          blockNumber,
-          gasUsed
-        }
-      });
-    } catch (prismaError) {
-      console.log('Prisma failed, using memory database:', prismaError);
-      
-      // Fallback to memory database
-      await memoryDb.upsertWallet({
-        address: walletAddress,
-        userId: 'default'
-      });
-
-      transaction = await memoryDb.createTransaction({
-        walletAddress,
-        type,
-        fromChain,
-        toChain,
-        token,
-        amount,
-        fromAddress,
-        toAddress,
-        txHash,
-        status,
-        bridgeTxId,
-        protocol,
-        fee,
-        blockNumber,
-        gasUsed
-      });
-    }
+    const transaction = await memoryDb.createTransaction({
+      walletAddress,
+      type,
+      fromChain,
+      toChain,
+      token,
+      amount,
+      fromAddress,
+      toAddress,
+      txHash,
+      status,
+      bridgeTxId,
+      protocol,
+      fee,
+      blockNumber,
+      gasUsed
+    });
 
     return NextResponse.json({
       success: true,
