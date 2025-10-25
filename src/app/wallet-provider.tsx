@@ -80,7 +80,7 @@ export function MerlinWalletProvider({ children }: { children: React.ReactNode }
           }
           
           return isSupported;
-        } catch (error) {
+        } catch {
           console.log(`⚠️ ${adapter.name}: Error checking status - including anyway`);
           return true; // Include if we can't determine availability
         }

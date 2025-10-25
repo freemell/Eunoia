@@ -1,6 +1,4 @@
 import { HeroScrollDemo } from "@/components/demo";
-import { SplashDemo } from "@/components/demo-splash";
-import { WavesDemo } from "@/components/demo-waves";
 
 export default function Home() {
   return <HeroScrollDemo />;

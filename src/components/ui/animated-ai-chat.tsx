@@ -8,11 +8,7 @@ import {
     Coins,
     TrendingUp,
     Shield,
-    Paperclip,
     SendIcon,
-    XIcon,
-    LoaderIcon,
-    Command,
     Zap,
     Database,
     FileText,
@@ -31,10 +27,6 @@ const WalletMultiButton = dynamic(
   { ssr: false }
 );
 
-const WalletDisconnectButton = dynamic(
-  async () => (await import('@solana/wallet-adapter-react-ui')).WalletDisconnectButton,
-  { ssr: false }
-);
 
 interface UseAutoResizeTextareaProps {
     minHeight: number;
@@ -166,7 +158,7 @@ function TypingDots() {
 export function AnimatedAIChat() {
     const [value, setValue] = useState("");
     const [isTyping, setIsTyping] = useState(false);
-    const [, startTransition] = useTransition();
+    const [, ] = useTransition();
     const [activeSuggestion, setActiveSuggestion] = useState<number>(-1);
     const [chatStarted, setChatStarted] = useState(false);
     const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -188,11 +180,11 @@ export function AnimatedAIChat() {
         }
     }, [messages]);
 
-    const [inputFocused, setInputFocused] = useState(false);
+    const [, setInputFocused] = useState(false);
     const commandPaletteRef = useRef<HTMLDivElement>(null);
     
     // Wallet integration with enhanced error handling
-    const { publicKey, connected, connect, disconnect, sendTransaction, wallet, connecting } = useWallet();
+    const { publicKey, connected, connect, sendTransaction, wallet, connecting } = useWallet();
     const { connection } = useConnection();
     const { clearError } = useWalletError();
     

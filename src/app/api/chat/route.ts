@@ -42,7 +42,7 @@ If unclear, ask for clarification.`;
 
 export async function POST(req: Request) {
   try {
-    const { message, userId = "default" } = await req.json();
+    const { message } = await req.json();
 
     if (!message) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
@@ -93,8 +93,8 @@ export async function POST(req: Request) {
           success: false
         });
       }
-    } catch (groqError: any) {
-      console.error('❌ Groq API error:', groqError.message, groqError);
+    } catch (groqError: unknown) {
+      console.error('❌ Groq API error:', groqError instanceof Error ? groqError.message : 'Unknown error', groqError);
       // Fallback response if Groq API fails
       return NextResponse.json({
         action: "chat",

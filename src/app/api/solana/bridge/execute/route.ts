@@ -3,7 +3,7 @@ import { merlinBridge } from '@/lib/bridge';
 
 export async function POST(req: Request) {
   try {
-    const { bridgeData, userWallet, signature } = await req.json();
+    const { bridgeData, userWallet } = await req.json();
 
     if (!bridgeData || !userWallet) {
       return NextResponse.json({ 
@@ -74,24 +74,3 @@ export async function POST(req: Request) {
   }
 }
 
-function getBridgeUrl(protocol: string) {
-  const urls = {
-    'Merlin Bridge': 'https://merlin-bridge.com',
-    'Wormhole': 'https://wormhole.com',
-    'AllBridge': 'https://allbridge.io'
-  };
-  return urls[protocol as keyof typeof urls] || 'https://merlin-bridge.com';
-}
-
-function getExplorerUrl(chain: string, address: string) {
-  const explorers = {
-    'ethereum': `https://etherscan.io/address/${address}`,
-    'base': `https://basescan.org/address/${address}`,
-    'polygon': `https://polygonscan.com/address/${address}`,
-    'avalanche': `https://snowtrace.io/address/${address}`,
-    'bsc': `https://bscscan.com/address/${address}`,
-    'arbitrum': `https://arbiscan.io/address/${address}`,
-    'optimism': `https://optimistic.etherscan.io/address/${address}`
-  };
-  return explorers[chain as keyof typeof explorers] || `https://etherscan.io/address/${address}`;
-}

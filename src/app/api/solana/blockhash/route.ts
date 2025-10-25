@@ -17,7 +17,7 @@ export async function GET() {
         console.log('Trying RPC URL:', rpcUrl);
         connection = new Connection(rpcUrl, 'confirmed');
         // Test connection by getting a recent blockhash
-        const { blockhash } = await connection.getLatestBlockhash();
+        await connection.getLatestBlockhash();
         console.log('Successfully got blockhash from:', rpcUrl);
         break; // Success, exit loop
       } catch (error) {
