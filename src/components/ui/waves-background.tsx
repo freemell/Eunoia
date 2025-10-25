@@ -13,6 +13,7 @@ interface WavesProps {
   yGap?: number
   friction?: number
   tension?: number
+  maxCursorMove?: number
   className?: string
 }
 
@@ -128,6 +129,7 @@ export default function Waves({
   yGap = 32,
   friction = 0.925,
   tension = 0.005,
+  maxCursorMove = 100,
   className,
 }: WavesProps) {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -136,6 +138,12 @@ export default function Waves({
   const boundingRef = useRef({ width: 0, height: 0, left: 0, top: 0 })
   const noiseRef = useRef(new Noise(Math.random()))
   const linesRef = useRef<Array<Array<{x: number, y: number, vx: number, vy: number, ox: number, oy: number}>>>([])
+  const mouseRef = useRef({
+    x: -10,
+    y: -10,
+    a: 0,
+    set: false,
+  })
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -206,8 +214,20 @@ export default function Waves({
           const noiseY = point.oy * 0.01 + time * waveSpeedY
           const noiseValue = noise.perlin2(noiseX, noiseY)
 
-          point.vx += (noiseValue * waveAmpX - point.x) * tension
-          point.vy += (noiseValue * waveAmpY - point.y) * tension
+          // Mouse influence
+          let mouseInfluence = 0
+          if (mouseRef.current.set) {
+            const dx = mouseRef.current.x - point.x
+            const dy = mouseRef.current.y - point.y
+            const distance = Math.sqrt(dx * dx + dy * dy)
+            const maxDistance = maxCursorMove // Mouse influence radius
+            if (distance < maxDistance) {
+              mouseInfluence = (1 - distance / maxDistance) * 50 // Mouse influence strength
+            }
+          }
+
+          point.vx += (noiseValue * waveAmpX - point.x) * tension + mouseInfluence * 0.1
+          point.vy += (noiseValue * waveAmpY - point.y) * tension + mouseInfluence * 0.1
 
           point.vx *= friction
           point.vy *= friction
@@ -237,6 +257,23 @@ export default function Waves({
       animate()
     })
 
+    // Mouse event handlers for interactive waves
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!container) return
+      const rect = container.getBoundingClientRect()
+      mouseRef.current.x = e.clientX - rect.left
+      mouseRef.current.y = e.clientY - rect.top
+      mouseRef.current.set = true
+    }
+
+    const handleMouseLeave = () => {
+      mouseRef.current.set = false
+    }
+
+    const handleMouseEnter = () => {
+      mouseRef.current.set = true
+    }
+
     // Use ResizeObserver for better resize handling
     const resizeObserver = new ResizeObserver(() => {
       setSize()
@@ -245,6 +282,9 @@ export default function Waves({
     
     if (container) {
       resizeObserver.observe(container)
+      container.addEventListener('mousemove', handleMouseMove)
+      container.addEventListener('mouseleave', handleMouseLeave)
+      container.addEventListener('mouseenter', handleMouseEnter)
     }
 
     window.addEventListener('resize', setSize)
@@ -252,8 +292,13 @@ export default function Waves({
       window.removeEventListener('resize', setSize)
       resizeObserver.disconnect()
       cancelAnimationFrame(animationId)
+      if (container) {
+        container.removeEventListener('mousemove', handleMouseMove)
+        container.removeEventListener('mouseleave', handleMouseLeave)
+        container.removeEventListener('mouseenter', handleMouseEnter)
+      }
     }
-  }, [lineColor, backgroundColor, waveSpeedX, waveSpeedY, waveAmpX, waveAmpY, xGap, yGap, friction, tension])
+  }, [lineColor, backgroundColor, waveSpeedX, waveSpeedY, waveAmpX, waveAmpY, xGap, yGap, friction, tension, maxCursorMove])
 
   return (
     <div ref={containerRef} className={className} style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, zIndex: 0 }}>

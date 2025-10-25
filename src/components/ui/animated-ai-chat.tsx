@@ -1132,6 +1132,7 @@ ${new Date(tx.createdAt).toLocaleString()}
                     waveAmpY={15}
                     friction={0.95}
                     tension={0.008}
+                    maxCursorMove={80}
                     xGap={15}
                     yGap={40}
                 />
