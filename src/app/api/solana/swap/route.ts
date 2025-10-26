@@ -44,8 +44,8 @@ export async function POST(req: Request) {
       amount: amountInLamports
     });
 
-    // Get quote from Jupiter using HTTP API
-    const quoteUrl = `https://quote-api.jup.ag/v6/quote?` + new URLSearchParams({
+    // Get quote from Jupiter Lite API (free, no API key required)
+    const quoteUrl = `https://lite-api.jup.ag/swap/v1/quote?` + new URLSearchParams({
       inputMint: fromMint,
       outputMint: toMint,
       amount: amountInLamports.toString(),
@@ -64,10 +64,10 @@ export async function POST(req: Request) {
       throw new Error('Invalid quote response from Jupiter');
     }
 
-    // Get swap transaction from Jupiter using HTTP API
+    // Get swap transaction from Jupiter Lite API
     console.log('🔄 Creating swap transaction...');
     
-    const swapUrl = 'https://quote-api.jup.ag/v6/swap';
+    const swapUrl = 'https://lite-api.jup.ag/swap/v1/swap';
     const swapResponse = await fetch(swapUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
