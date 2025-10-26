@@ -64,8 +64,12 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: '/merlin-logo.png',
-    shortcut: '/merlin-logo.png',
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/merlin-logo.png', type: 'image/png', sizes: '32x32' },
+      { url: '/merlin-logo.png', type: 'image/png', sizes: '180x180' },
+    ],
+    shortcut: '/favicon.ico',
     apple: '/merlin-logo.png',
   },
 };
