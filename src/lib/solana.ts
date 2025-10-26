@@ -1,7 +1,7 @@
 import { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } from '@solana/web3.js';
 
 // Solana connection
-export const connection = new Connection(process.env.SOLANA_RPC_URL || 'https://api.devnet.solana.com');
+export const connection = new Connection(process.env.SOLANA_RPC_URL || 'https://api.mainnet-beta.solana.com');
 
 // Get SOL balance
 export async function getBalance(publicKey: PublicKey): Promise<number> {
