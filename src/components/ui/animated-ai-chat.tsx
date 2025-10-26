@@ -19,7 +19,7 @@ import * as React from "react"
 import Image from "next/image";
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import { useWalletError } from '@/app/wallet-provider';
-import { Transaction, SystemProgram, LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js';
+import { Transaction, SystemProgram, LAMPORTS_PER_SOL, PublicKey, VersionedTransaction } from '@solana/web3.js';
 import dynamic from 'next/dynamic';
 
 const WalletMultiButton = dynamic(
@@ -591,10 +591,26 @@ export function AnimatedAIChat() {
 
             const result = await response.json();
             
-            if (result.success) {
+            if (result.success && result.transaction) {
+                // Deserialize the transaction
+                const transaction = VersionedTransaction.deserialize(
+                    Buffer.from(result.transaction, 'base64')
+                );
+
+                // Sign and send the transaction
+                const signature = await sendTransaction(transaction, connection);
+                
                 setMessages(prev => [...prev, {
                     role: 'assistant',
-                    content: `✅ ${result.message}\n\nSwap ID: ${result.swapId}`
+                    content: `✅ Swap transaction sent! Waiting for confirmation...\n\nSignature: ${signature}`
+                }]);
+
+                // Wait for confirmation
+                await connection.confirmTransaction(signature, 'confirmed');
+                
+                setMessages(prev => [...prev, {
+                    role: 'assistant',
+                    content: `✅ Successfully swapped ${transactionData.amount} ${transactionData.fromToken} to ${transactionData.toToken}!\n\nTransaction: ${signature}`
                 }]);
             } else {
                 setMessages(prev => [...prev, {
@@ -610,7 +626,7 @@ export function AnimatedAIChat() {
         } finally {
             setIsTyping(false);
         }
-    }, [publicKey]);
+    }, [publicKey, sendTransaction, connection]);
 
     // Make executeBridgeTransaction available globally for onclick
     useEffect(() => {
