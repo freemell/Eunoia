@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server';
+import { Connection, PublicKey } from '@solana/web3.js';
+import { quoteApi, swapApi } from '@jup-ag/api';
 
 export async function POST(req: Request) {
   try {
@@ -26,86 +28,57 @@ export async function POST(req: Request) {
     const fromMint = tokenMints[fromToken.toUpperCase()] || fromToken;
     const toMint = tokenMints[toToken.toUpperCase()] || toToken;
 
-    // Get swap quote from Jupiter
-    const amountInLamports = fromToken.toUpperCase() === 'SOL' 
-      ? Math.floor(Number(amount) * 1e9).toString() // Convert SOL to lamports
-      : Math.floor(Number(amount) * 1e6).toString(); // Convert USDC/USDT to smallest unit
+    // Connect to Solana
+    const connection = new Connection(
+      process.env.NEXT_PUBLIC_SOLANA_RPC_URL || 'https://api.mainnet-beta.solana.com',
+      'confirmed'
+    );
 
-    const quoteUrl = `https://quote-api.jup.ag/v6/quote?` + new URLSearchParams({
+    // Get swap quote from Jupiter using SDK
+    const amountInLamports = fromToken.toUpperCase() === 'SOL' 
+      ? Math.floor(Number(amount) * 1e9) // Convert SOL to lamports
+      : Math.floor(Number(amount) * 1e6); // Convert USDC/USDT to smallest unit
+
+    console.log('📊 Fetching quote from Jupiter for:', {
+      inputMint: fromMint,
+      outputMint: toMint,
+      amount: amountInLamports
+    });
+
+    const quote = await quoteApi.getQuote({
       inputMint: fromMint,
       outputMint: toMint,
       amount: amountInLamports,
-      slippageBps: '50', // 0.5% slippage
+      slippageBps: 50, // 0.5% slippage
     });
 
-    console.log('📊 Fetching quote from Jupiter:', quoteUrl);
-    
-    let quoteResponse;
-    try {
-      quoteResponse = await fetch(quoteUrl, {
-        headers: {
-          'Accept': 'application/json',
-        },
-      });
-    } catch (fetchError) {
-      console.error('❌ Fetch error:', fetchError);
-      throw new Error(`Network error: Unable to reach Jupiter API. Please check your internet connection.`);
-    }
-    
-    if (!quoteResponse.ok) {
-      const errorText = await quoteResponse.text();
-      console.error('❌ Quote API error:', errorText);
-      throw new Error(`Failed to get quote: ${quoteResponse.status} ${quoteResponse.statusText}`);
-    }
-
-    const quote = await quoteResponse.json();
     console.log('✅ Got quote:', quote);
 
     if (!quote || !quote.outAmount) {
       throw new Error('Invalid quote response from Jupiter');
     }
 
-    // Get swap transaction from Jupiter
-    const swapUrl = 'https://quote-api.jup.ag/v6/swap';
+    // Get swap transaction from Jupiter using SDK
+    console.log('🔄 Creating swap transaction...');
     
-    let swapResponse;
-    try {
-      swapResponse = await fetch(swapUrl, {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: JSON.stringify({
-          quoteResponse: quote,
-          userPublicKey: userWallet,
-          wrapAndUnwrapSol: true,
-          dynamicComputeUnitLimit: true,
-          priorityLevelWithMaxLamports: 'fast',
-        }),
-      });
-    } catch (fetchError) {
-      console.error('❌ Swap API fetch error:', fetchError);
-      throw new Error(`Network error: Unable to create swap transaction. Please try again.`);
-    }
+    const swapResponse = await swapApi.postSwap({
+      quoteResponse: quote,
+      userPublicKey: new PublicKey(userWallet),
+      wrapAndUnwrapSol: true,
+      dynamicComputeUnitLimit: true,
+      priorityLevelWithMaxLamports: 'fast',
+    });
 
-    if (!swapResponse.ok) {
-      const errorText = await swapResponse.text();
-      console.error('❌ Swap API error:', errorText);
-      throw new Error(`Failed to create swap transaction: ${swapResponse.status} ${swapResponse.statusText}`);
-    }
-
-    const swapTransactionData = await swapResponse.json();
     console.log('✅ Swap transaction created');
 
-    if (!swapTransactionData || !swapTransactionData.swapTransaction) {
+    if (!swapResponse || !swapResponse.swapTransaction) {
       throw new Error('Invalid swap transaction response from Jupiter');
     }
 
     // Return the transaction that needs to be signed by the user
     return NextResponse.json({
       success: true,
-      transaction: swapTransactionData.swapTransaction,
+      transaction: swapResponse.swapTransaction,
       userPublicKey: userWallet,
       message: `Ready to swap ${amount} ${fromToken} to ${toToken}. Please sign the transaction in your wallet.`,
       quote: {
