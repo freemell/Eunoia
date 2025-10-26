@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { Connection, PublicKey } from '@solana/web3.js';
-import { quoteApi, swapApi } from '@jup-ag/api';
+import { QuoteApi, SwapApi } from '@jup-ag/api';
 
 export async function POST(req: Request) {
   try {
@@ -45,6 +45,7 @@ export async function POST(req: Request) {
       amount: amountInLamports
     });
 
+    const quoteApi = new QuoteApi();
     const quote = await quoteApi.getQuote({
       inputMint: fromMint,
       outputMint: toMint,
@@ -61,6 +62,7 @@ export async function POST(req: Request) {
     // Get swap transaction from Jupiter using SDK
     console.log('🔄 Creating swap transaction...');
     
+    const swapApi = new SwapApi();
     const swapResponse = await swapApi.postSwap({
       quoteResponse: quote,
       userPublicKey: new PublicKey(userWallet),
