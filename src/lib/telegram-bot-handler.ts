@@ -1,6 +1,6 @@
-import { Bot, Context, InlineKeyboard } from 'grammy';
+import { Context, InlineKeyboard } from 'grammy';
 import { getTelegramWallet, getTelegramWalletAddress, hasTelegramWallet, createTelegramWallet, importTelegramWallet } from './telegram-wallet';
-import { Connection, Keypair, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL, VersionedTransaction } from '@solana/web3.js';
+import { Connection, Keypair, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { SolanaDomainResolver } from './domain-resolver';
 
 const connection = new Connection(
@@ -8,11 +8,24 @@ const connection = new Connection(
   'confirmed'
 );
 
+// Transaction interface for history
+interface TransactionHistory {
+  type: string;
+  status: string;
+  amount: string;
+  token: string;
+  txHash?: string;
+  toAddress?: string;
+  fromChain?: string;
+  toChain?: string;
+  createdAt: string;
+}
+
 // User session states
 interface UserSession {
   telegramId: string;
   state: 'idle' | 'waiting_for_import_key' | 'waiting_for_send_amount' | 'waiting_for_send_to' | 'waiting_for_swap_from' | 'waiting_for_swap_to' | 'waiting_for_swap_amount';
-  data?: Record<string, any>;
+  data?: Record<string, unknown>;
 }
 
 const userSessions = new Map<string, UserSession>();
@@ -60,13 +73,6 @@ function getBackMenu() {
     .text('◀️ Back to Menu', 'main_menu');
 }
 
-function getConfirmMenu(action: string, params: string) {
-  return new InlineKeyboard()
-    .text('✅ Confirm', `confirm_${action}_${params}`)
-    .text('❌ Cancel', 'main_menu')
-    .row()
-    .text('◀️ Back', 'main_menu');
-}
 
 // Helper: Format balance message
 async function formatBalanceMessage(telegramId: string): Promise<string> {
@@ -168,7 +174,6 @@ async function sendSOLTransaction(keypair: Keypair, to: string, amount: number |
 export async function handleTelegramMessage(ctx: Context) {
   const telegramId = ctx.from?.id.toString() || '';
   const messageText = ctx.message?.text || '';
-  const session = getSession(telegramId);
 
   try {
     // Handle commands
@@ -339,7 +344,6 @@ async function handleBalance(ctx: Context) {
 async function handleCallbackQuery(ctx: Context) {
   const telegramId = ctx.from?.id.toString() || '';
   const callbackData = ctx.callbackQuery?.data || '';
-  const session = getSession(telegramId);
 
   await ctx.answerCallbackQuery();
 
@@ -420,11 +424,7 @@ async function handleCallbackQuery(ctx: Context) {
       default:
         // Handle confirm actions
         if (callbackData.startsWith('confirm_')) {
-          const parts = callbackData.split('_');
-          if (parts.length >= 3) {
-            const action = parts[1];
-            // Handle confirmations if needed
-          }
+          // Handle confirmations if needed in future
         }
     }
   } catch (error) {
@@ -515,7 +515,7 @@ async function handleHistory(ctx: Context) {
     
     if (historyData.success && historyData.transactions.length > 0) {
       let message = `📋 *Transaction History*\n\n`;
-      historyData.transactions.slice(0, 10).forEach((tx: any, index: number) => {
+      historyData.transactions.slice(0, 10).forEach((tx: TransactionHistory, index: number) => {
         message += `${index + 1}. *${tx.type}* - ${tx.amount} ${tx.token}\n`;
         message += `   Status: ${tx.status}\n`;
         if (tx.txHash) {
@@ -533,7 +533,7 @@ async function handleHistory(ctx: Context) {
         reply_markup: getMainMenu()
       });
     }
-  } catch (error) {
+  } catch {
     await ctx.editMessageText('❌ Failed to fetch transaction history.', {
       reply_markup: getMainMenu()
     });

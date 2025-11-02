@@ -1,4 +1,4 @@
-import { Keypair, PublicKey } from '@solana/web3.js';
+import { Keypair } from '@solana/web3.js';
 import { encrypt, decrypt } from './encryption';
 import { PrismaClient } from '@prisma/client';
 

@@ -1,12 +1,8 @@
 import crypto from 'crypto';
 
 const ALGORITHM = 'aes-256-gcm';
-const KEY_LENGTH = 32; // 256 bits
 const IV_LENGTH = 16; // 128 bits
-const SALT_LENGTH = 64;
 const TAG_LENGTH = 16;
-const TAG_POSITION = SALT_LENGTH + IV_LENGTH;
-const ENCRYPTED_POSITION = TAG_POSITION + TAG_LENGTH;
 
 /**
  * Get encryption key from environment variable or generate a default one

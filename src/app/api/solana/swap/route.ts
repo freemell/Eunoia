@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { Connection, PublicKey } from '@solana/web3.js';
 
 export async function POST(req: Request) {
   try {
@@ -26,12 +25,6 @@ export async function POST(req: Request) {
 
     const fromMint = tokenMints[fromToken.toUpperCase()] || fromToken;
     const toMint = tokenMints[toToken.toUpperCase()] || toToken;
-
-    // Connect to Solana
-    const connection = new Connection(
-      process.env.NEXT_PUBLIC_SOLANA_RPC_URL || 'https://api.mainnet-beta.solana.com',
-      'confirmed'
-    );
 
     // Get swap quote from Jupiter using SDK
     const amountInLamports = fromToken.toUpperCase() === 'SOL' 
