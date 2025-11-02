@@ -106,8 +106,8 @@ async function sendSOLTransaction(keypair: Keypair, to: string, amount: number |
     // Resolve .sol domain if needed
     if (to.endsWith('.sol')) {
       const domainResult = await SolanaDomainResolver.resolveDomain(to);
-      if (!domainResult.success) {
-        return { success: false, error: `Failed to resolve domain: ${domainResult.error}` };
+      if (!domainResult.success || !domainResult.address) {
+        return { success: false, error: `Failed to resolve domain: ${domainResult.error || 'Address not found'}` };
       }
       recipientAddress = domainResult.address;
     }
