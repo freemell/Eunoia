@@ -22,7 +22,7 @@ model Message {
 
 model Transaction {
   id            String   @id @default(cuid())
-  walletAddress String   // User's wallet address
+  walletAddress String   // User's wallet address (can match Wallet.address or TelegramUser.publicKey)
   type          String   // 'send', 'receive', 'bridge', 'swap'
   fromChain     String?  // Source chain
   toChain       String?  // Destination chain
@@ -47,7 +47,20 @@ model Wallet {
   userId    String   @default("default")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model TelegramUser {
+  id           Int      @id @default(autoincrement())
+  telegramId   String   @unique
+  username     String?
+  firstName    String?
+  lastName     String?
+  encryptedKey String   // Encrypted private key
+  publicKey    String   @unique // Solana public key (wallet address)
+  iv           String   // Initialization vector for encryption
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
   
-  // Relations
-  transactions Transaction[]
+  @@index([telegramId])
+  @@index([publicKey])
 }
