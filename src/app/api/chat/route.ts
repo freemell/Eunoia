@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
 import Groq from 'groq-sdk';
 
-const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY,
-});
+const groq = process.env.GROQ_API_KEY 
+  ? new Groq({
+      apiKey: process.env.GROQ_API_KEY,
+    })
+  : null;
 
 // Enhanced system prompt for natural language processing
 const SYSTEM_PROMPT = `You are Merlin, a Solana blockchain AI assistant. You help users with blockchain operations through natural conversation.
@@ -55,6 +57,15 @@ export async function POST(req: Request) {
     }
 
     console.log('🤖 Processing message with Groq:', message);
+
+    if (!groq) {
+      return NextResponse.json({
+        action: "chat",
+        params: {},
+        response: "Groq API is not configured. Please set GROQ_API_KEY environment variable.",
+        success: false
+      }, { status: 500 });
+    }
 
     try {
       // Use Groq for natural language processing

@@ -174,6 +174,7 @@ async function sendSOLTransaction(keypair: Keypair, to: string, amount: number |
 export async function handleTelegramMessage(ctx: Context) {
   const telegramId = ctx.from?.id.toString() || '';
   const messageText = ctx.message?.text || '';
+  const session = getSession(telegramId);
 
   try {
     // Handle commands
@@ -231,7 +232,7 @@ export async function handleTelegramMessage(ctx: Context) {
         return;
       }
 
-      const amount = session.data?.amount || '0';
+      const amount = (session.data?.amount as string) || '0';
       const result = await sendSOLTransaction(keypair, messageText, amount);
       
       if (result.success && result.signature) {
