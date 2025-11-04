@@ -1330,9 +1330,18 @@ ${new Date(tx.createdAt).toLocaleString()}
                                  {/* Telegram Bot Link */}
                                  <motion.a
                                      href={(() => {
-                                       const url = process.env.NEXT_PUBLIC_TELEGRAM_BOT_URL || "https://t.me/your_merlin_bot";
-                                       // Ensure it starts with https://
-                                       return url.startsWith('http') ? url : `https://${url}`;
+                                       const url = process.env.NEXT_PUBLIC_TELEGRAM_BOT_URL || "https://t.me/askmerlin_bot";
+                                       // Handle different URL formats
+                                       if (url.startsWith('http://') || url.startsWith('https://')) {
+                                         return url;
+                                       } else if (url.startsWith('t.me/')) {
+                                         return `https://${url}`;
+                                       } else if (url.startsWith('@')) {
+                                         return `https://t.me/${url.slice(1)}`;
+                                       } else {
+                                         // If it's just the bot username, add t.me/
+                                         return `https://t.me/${url}`;
+                                       }
                                      })()}
                                      target="_blank"
                                      rel="noopener noreferrer"
