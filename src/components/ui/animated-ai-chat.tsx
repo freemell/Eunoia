@@ -1329,7 +1329,11 @@ ${new Date(tx.createdAt).toLocaleString()}
                                  
                                  {/* Telegram Bot Link */}
                                  <motion.a
-                                     href={process.env.NEXT_PUBLIC_TELEGRAM_BOT_URL || "https://t.me/your_merlin_bot"}
+                                     href={(() => {
+                                       const url = process.env.NEXT_PUBLIC_TELEGRAM_BOT_URL || "https://t.me/your_merlin_bot";
+                                       // Ensure it starts with https://
+                                       return url.startsWith('http') ? url : `https://${url}`;
+                                     })()}
                                      target="_blank"
                                      rel="noopener noreferrer"
                                      initial={{ opacity: 0, y: 10 }}
