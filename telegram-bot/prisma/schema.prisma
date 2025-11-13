@@ -1,0 +1,42 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model TelegramUser {
+  id           Int      @id @default(autoincrement())
+  telegramId   String   @unique
+  username     String?  // Telegram username (for @username mentions)
+  firstName    String?
+  lastName     String?
+  encryptedKey String   // Encrypted private key
+  publicKey    String   @unique // Solana public key (wallet address)
+  iv           String   // Initialization vector for encryption
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  @@index([telegramId])
+  @@index([publicKey])
+  @@index([username]) // Index username for faster lookups
+}
+
+model GroupChat {
+  id        Int      @id @default(autoincrement())
+  chatId    String   @unique // Telegram group chat ID
+  title     String?
+  type      String   // "group" or "supergroup"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([chatId])
+}
+
+
+

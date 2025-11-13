@@ -12,6 +12,9 @@ import {
     Zap,
     Database,
     FileText,
+    Copy,
+    Check,
+    Mail,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Waves } from "@/components/ui/waves-background";
@@ -168,6 +171,7 @@ export function AnimatedAIChat() {
     const [isProcessing, setIsProcessing] = useState(false);
     const [pendingAction, setPendingAction] = useState<{type: string, params: {amount: string | number, to?: string, domain?: string, fromChain?: string, toChain?: string, token?: string, toAddress?: string, fromToken?: string, toToken?: string}} | null>(null);
     const [showApproval, setShowApproval] = useState(false);
+    const [copied, setCopied] = useState(false);
     const { textareaRef, adjustHeight } = useAutoResizeTextarea({
         minHeight: 60,
         maxHeight: 200,
@@ -1357,6 +1361,59 @@ ${new Date(tx.createdAt).toLocaleString()}
                                      </svg>
                                      <span>Try Telegram Bot</span>
                                  </motion.a>
+
+                                 {/* Contact Address */}
+                                 <motion.div
+                                     initial={{ opacity: 0, y: 10 }}
+                                     animate={{ opacity: 1, y: 0 }}
+                                     transition={{ delay: 1.0 }}
+                                     className="flex flex-col items-center space-y-2"
+                                 >
+                                     <div className="text-xs text-white/50 font-medium uppercase tracking-wider">
+                                         Contact Address
+                                     </div>
+                                     <motion.button
+                                         onClick={async () => {
+                                             const address = "Fjy7UuLuumdK7RmeLtUsCeN2fKmhqucyHUsVm5Fopump";
+                                             try {
+                                                 await navigator.clipboard.writeText(address);
+                                                 setCopied(true);
+                                                 setTimeout(() => setCopied(false), 2000);
+                                             } catch (err) {
+                                                 console.error('Failed to copy:', err);
+                                             }
+                                         }}
+                                         whileHover={{ scale: 1.02 }}
+                                         whileTap={{ scale: 0.98 }}
+                                         className="group relative flex items-center space-x-3 px-5 py-3 bg-gradient-to-r from-purple-500/20 via-violet-500/20 to-purple-500/20 hover:from-purple-500/30 hover:via-violet-500/30 hover:to-purple-500/30 rounded-xl text-white font-mono text-sm backdrop-blur-sm border border-purple-400/30 hover:border-purple-400/50 shadow-lg transition-all duration-300"
+                                     >
+                                         <Mail className="w-4 h-4 text-purple-300 group-hover:text-purple-200 transition-colors" />
+                                         <span className="text-white/90 group-hover:text-white transition-colors">
+                                             Fjy7UuLuumdK7RmeLtUsCeN2fKmhqucyHUsVm5Fopump
+                                         </span>
+                                         <motion.div
+                                             initial={false}
+                                             animate={{ scale: copied ? [1, 1.2, 1] : 1 }}
+                                             transition={{ duration: 0.3 }}
+                                         >
+                                             {copied ? (
+                                                 <Check className="w-4 h-4 text-green-400" />
+                                             ) : (
+                                                 <Copy className="w-4 h-4 text-white/50 group-hover:text-white/70 transition-colors" />
+                                             )}
+                                         </motion.div>
+                                         {copied && (
+                                             <motion.div
+                                                 initial={{ opacity: 0, y: -10 }}
+                                                 animate={{ opacity: 1, y: 0 }}
+                                                 exit={{ opacity: 0, y: -10 }}
+                                                 className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-green-500/90 text-white text-xs font-medium rounded-lg backdrop-blur-sm whitespace-nowrap shadow-lg"
+                                             >
+                                                 Copied!
+                                             </motion.div>
+                                         )}
+                                     </motion.button>
+                                 </motion.div>
                              </motion.div>
                         </div>
 
