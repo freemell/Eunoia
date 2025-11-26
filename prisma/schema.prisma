@@ -1,0 +1,91 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  content   String
+  role      String   // 'user' or 'assistant'
+  userId    String   @default("default")
+  action    String?  // 'connect', 'send', 'balance', etc.
+  params    String?  // JSON string of extracted parameters
+  createdAt DateTime @default(now())
+}
+
+model Transaction {
+  id            String   @id @default(cuid())
+  walletAddress String   // User's wallet address (can match Wallet.address or TelegramUser.publicKey)
+  type          String   // 'send', 'receive', 'bridge', 'swap'
+  fromChain     String?  // Source chain
+  toChain       String?  // Destination chain
+  token         String   // Token symbol (SOL, ETH, etc.)
+  amount        String   // Amount as string
+  fromAddress   String?  // Sender address
+  toAddress     String?  // Recipient address
+  txHash        String?  // Transaction hash
+  status        String   @default("pending") // 'pending', 'completed', 'failed'
+  bridgeTxId    String?  // Bridge transaction ID
+  protocol      String?  // Bridge protocol used
+  fee           String?  // Transaction fee
+  blockNumber   String?  // Block number
+  gasUsed       String?  // Gas used
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Wallet {
+  id        String   @id @default(cuid())
+  address   String   @unique
+  userId    String   @default("default")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TelegramUser {
+  id           Int      @id @default(autoincrement())
+  telegramId   String   @unique
+  username     String?
+  firstName    String?
+  lastName     String?
+  encryptedKey String   // Encrypted private key
+  publicKey    String   @unique // Solana public key (wallet address)
+  iv           String   // Initialization vector for encryption
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  @@index([telegramId])
+  @@index([publicKey])
+}
+
+model LimitOrder {
+  id            String   @id @default(cuid())
+  walletAddress String   // User's wallet address
+  userId        String?  // Optional user ID for web users
+  telegramId    String?  // Optional Telegram user ID
+  tokenAddress  String   // Token mint address
+  tokenSymbol   String?  // Token symbol (e.g., "BONK", "WIF")
+  orderType     String   // 'buy' or 'sell'
+  triggerType   String   // 'market_cap' or 'price'
+  triggerValue  String   // Trigger value (e.g., "50000" for 50k market cap)
+  amount        String?  // Amount to buy/sell (can be percentage like "50%")
+  amountType    String   @default("fixed") // 'fixed' or 'percentage'
+  status        String   @default("active") // 'active', 'executed', 'cancelled', 'expired'
+  executedAt    DateTime?
+  txHash        String?  // Transaction hash if executed
+  errorMessage  String?  // Error message if execution failed
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([walletAddress])
+  @@index([status])
+  @@index([tokenAddress])
+  @@index([createdAt])
+}

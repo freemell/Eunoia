@@ -1,0 +1,9 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/check-limit-orders",
+      "schedule": "*/5 * * * *"
+    }
+  ]
+}
+

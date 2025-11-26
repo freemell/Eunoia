@@ -1,0 +1,40 @@
+const fs = require('fs');
+
+// Create a simple SVG that represents the site
+const svg = `
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" fill="#000000"/>
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#000000;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#1a0033;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#000000;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bgGradient)"/>
+  
+  <!-- Background elements -->
+  <circle cx="300" cy="150" r="100" fill="rgba(139, 92, 246, 0.2)"/>
+  <circle cx="900" cy="480" r="150" fill="rgba(59, 130, 246, 0.2)"/>
+  <circle cx="600" cy="300" r="80" fill="rgba(16, 185, 129, 0.1)"/>
+  
+  <!-- Main title -->
+  <text x="600" y="300" font-family="Arial, sans-serif" font-size="72" font-weight="800" fill="white" text-anchor="middle">MERLIN</text>
+  
+  <!-- Subtitle -->
+  <text x="600" y="350" font-family="Arial, sans-serif" font-size="24" font-weight="300" fill="rgba(255, 255, 255, 0.7)" text-anchor="middle">Your Solana Blockchain Assistant</text>
+  
+  <!-- Chat preview -->
+  <rect x="300" y="400" width="600" height="150" rx="12" fill="rgba(255, 255, 255, 0.05)" stroke="rgba(255, 255, 255, 0.1)"/>
+  
+  <!-- Chat message -->
+  <text x="600" y="440" font-family="Arial, sans-serif" font-size="18" fill="rgba(255, 255, 255, 0.9)" text-anchor="middle">Ask Merlin anything...</text>
+  
+  <!-- Status -->
+  <text x="600" y="480" font-family="Arial, sans-serif" font-size="14" fill="rgba(255, 255, 255, 0.6)" text-anchor="middle">Bridge Ready</text>
+</svg>
+`;
+
+// Write the SVG to a file
+fs.writeFileSync('merlin-preview.svg', svg);
+console.log('Preview SVG generated!');

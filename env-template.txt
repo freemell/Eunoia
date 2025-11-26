@@ -1,0 +1,21 @@
+# Environment Variables for Merlin AI
+# Copy this content to your .env file
+
+# Telegram Bot Configuration
+TELEGRAM_BOT_TOKEN=8068396024:AAEz8Ykj4XrO9FHy4qz-GTfOD5PwqAULlaI
+NEXT_PUBLIC_TELEGRAM_BOT_URL=https://t.me/askmerlin_bot
+
+# Database
+DATABASE_URL=file:./dev.db
+
+# Security
+ENCRYPTION_SECRET=590a64fc3c8f6b4f57c0fde30dcac4374ade7e370a171ee212d52e07cd7ea033
+
+# AI Services
+OPENAI_API_KEY=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
+GROQ_API_KEY=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
+
+# Solana Configuration
+SOLANA_RPC_URL=https://api.mainnet-beta.solana.com
+NEXT_PUBLIC_SOLANA_RPC_URL=https://api.mainnet-beta.solana.com
+

@@ -1,0 +1,10 @@
+node_modules/
+.env
+.env.local
+*.log
+.DS_Store
+# Database files - INCLUDED in repo for Railway persistence
+# bot.db and dev.db are tracked to preserve wallets
+
+
+

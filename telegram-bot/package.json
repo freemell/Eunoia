@@ -1,0 +1,28 @@
+{
+  "name": "merlin-telegram-bot",
+  "version": "1.0.0",
+  "description": "Merlin Telegram Bot - Standalone",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch index.js",
+    "start": "node index.js",
+    "build": "npx prisma generate",
+    "postinstall": "npx prisma generate"
+  },
+  "dependencies": {
+    "@mayanfinance/swap-sdk": "^11.4.0",
+    "@prisma/client": "^6.18.0",
+    "@solana/spl-token": "^0.4.14",
+    "@solana/web3.js": "^1.98.4",
+    "dotenv": "^16.4.5",
+    "grammy": "^1.24.1",
+    "groq-sdk": "^0.8.0",
+    "openai": "^4.28.0",
+    "winston": "^3.13.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0"
+  }
+}
+
