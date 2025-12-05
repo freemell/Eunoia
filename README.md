@@ -1,36 +1,101 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Eunoia - AI-Powered Solana Assistant
+
+Eunoia is a rebranded, modern AI-powered Solana blockchain assistant with a cyber-matrix aesthetic. Built with Next.js, TypeScript, and Tailwind CSS.
+
+## Features
+
+- 🤖 **AI Chat Interface** - Natural language commands for Solana operations
+- 💰 **Wallet Integration** - Connect with Phantom, Solflare, and other Solana wallets
+- 💸 **Send SOL** - Send SOL to any address or .sol domain
+- 🔄 **Token Swaps** - Swap tokens using Jupiter aggregator
+- 📊 **Balance Checking** - Real-time SOL balance display
+- 🎯 **Limit Orders** - Set buy/sell orders based on market cap or price
+- 🎨 **Modern UI** - Cyber-matrix animated background with Eunoia branding
+
+## Tech Stack
+
+- **Framework**: Next.js 15
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **Blockchain**: Solana Web3.js
+- **Wallets**: Solana Wallet Adapter
+- **AI**: Groq API (Llama 3.1)
+- **Animations**: Framer Motion
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
+- Node.js 18+ 
+- npm or yarn
+- Solana wallet (Phantom, Solflare, etc.)
+
+### Installation
+
+1. Clone the repository:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/freemell/Eunoia.git
+cd Eunoia
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies:
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Set up environment variables:
+Create a `.env.local` file in the root directory:
+```env
+GROQ_API_KEY=your_groq_api_key
+NEXT_PUBLIC_SOLANA_RPC_URL=https://api.mainnet-beta.solana.com
+DATABASE_URL=file:./dev.db
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Run the development server:
+```bash
+npm run dev
+```
 
-## Learn More
+5. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-To learn more about Next.js, take a look at the following resources:
+## Project Structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+src/
+├── app/
+│   ├── api/              # API routes
+│   │   ├── chat/         # AI chat endpoint
+│   │   └── solana/       # Solana operations
+│   ├── docs/             # Documentation page
+│   ├── layout.tsx        # Root layout
+│   ├── page.tsx          # Home page
+│   └── wallet-provider.tsx # Wallet context
+├── components/
+│   ├── ui/               # UI components
+│   │   ├── animated-input.tsx    # Orb input component
+│   │   └── cyber-matrix-hero.tsx # Matrix background
+│   └── eunoia-chat.tsx   # Main chat component
+└── lib/
+    └── utils.ts          # Utility functions
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Usage
 
-## Deploy on Vercel
+1. **Connect Wallet**: Click the wallet button in the header to connect your Solana wallet
+2. **Chat Commands**: Use natural language to interact:
+   - "Send 0.1 SOL to [address]"
+   - "What's my balance?"
+   - "Swap 1 SOL for USDC"
+   - "If BONK hits 50k mc, buy 0.1 SOL worth"
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Branding
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Eunoia uses a cyber-matrix aesthetic with:
+- **Primary Color**: Matrix Green (#00ff41)
+- **Secondary Color**: Cyber Blue (#00d4ff)
+- **Accent Color**: Neon Magenta (#ff00ff)
+- **Background**: Animated matrix grid
+
+## License
+
+MIT
