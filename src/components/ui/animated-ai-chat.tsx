@@ -13,6 +13,7 @@ import {
     Database,
     FileText,
     Copy,
+    ArrowLeft,
     Check,
     Mail,
 } from "lucide-react";
@@ -1154,14 +1155,14 @@ ${new Date(tx.createdAt).toLocaleString()}
                 <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
                     <div className="bg-gray-800/90 border border-gray-700 rounded-xl p-8 max-w-md mx-4 text-center">
                         <div className="w-16 h-16 mx-auto mb-4">
-                            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-500"></div>
+                            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-green-500"></div>
                         </div>
                         <h3 className="text-xl font-semibold text-white mb-2">Processing Transaction</h3>
                         <p className="text-gray-300 mb-4">Calculating amounts and preparing transaction...</p>
                         <div className="flex items-center justify-center space-x-2">
-                            <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
-                            <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse delay-100"></div>
-                            <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse delay-200"></div>
+                            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse delay-100"></div>
+                            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse delay-200"></div>
                         </div>
                     </div>
                 </div>
@@ -1211,7 +1212,7 @@ ${new Date(tx.createdAt).toLocaleString()}
                                     </div>
                                     <div className="flex items-center justify-between">
                                         <span className="text-gray-300">Recipient</span>
-                                        <span className="text-purple-400 font-mono text-sm">
+                                        <span className="text-green-400 font-mono text-sm">
                                             {pendingAction.params.toAddress?.slice(0, 8)}...{pendingAction.params.toAddress?.slice(-8)}
                                         </span>
                                     </div>
@@ -1247,7 +1248,7 @@ ${new Date(tx.createdAt).toLocaleString()}
                             </button>
                             <button
                                 onClick={handleApproval}
-                                className="flex-1 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-lg transition-colors"
+                                className="flex-1 px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-lg transition-colors"
                             >
                                 Approve
                             </button>
@@ -1259,10 +1260,54 @@ ${new Date(tx.createdAt).toLocaleString()}
             {/* Cyber Matrix Background */}
             <CyberMatrixHero />
 
+            {/* Top Right Wallet Button */}
+            <div className="fixed top-4 right-4 z-50">
+                <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.5 }}
+                >
+                    <div className="relative">
+                        <WalletMultiButton />
+                        {walletError && (
+                            <motion.div
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="absolute top-full right-0 mt-2 text-sm text-red-400 bg-red-500/20 px-3 py-2 rounded-lg backdrop-blur-sm max-w-xs text-center border border-red-500/30"
+                            >
+                                <div className="font-medium mb-1">⚠️ Connection Issue</div>
+                                <div className="text-xs text-red-300">{walletError}</div>
+                            </motion.div>
+                        )}
+                        {connected && publicKey && balance !== null && (
+                            <motion.div
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="absolute top-full right-0 mt-2 px-2 py-1.5"
+                            >
+                                <div className="flex items-center space-x-1.5">
+                                    <div className="w-1.5 h-1.5 bg-green-400 rounded-full"></div>
+                                    <div className="flex items-baseline space-x-1 font-mono">
+                                        <span className="text-white/70 text-xs font-medium">{balance.toFixed(4)}</span>
+                                        <span className="text-white/60 text-xs">SOL</span>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
+                    </div>
+                </motion.div>
+            </div>
+
             {/* Conditional rendering based on chatStarted */}
             {!chatStarted ? (
-                // Initial state: Eunoia logo, title, command suggestions
-                <div className="w-full max-w-2xl mx-auto relative">
+                // Initial state: Eunoia logo, title, command suggestions - centered
+                <motion.div 
+                    className="w-full max-w-5xl mx-auto relative flex items-center justify-center min-h-screen"
+                    initial={{ y: 0, opacity: 1 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: -100, opacity: 0 }}
+                    transition={{ duration: 0.5, ease: "easeInOut" }}
+                >
                     <motion.div
                         className="relative z-10 space-y-12"
                         initial={{ opacity: 0, y: 20 }}
@@ -1279,165 +1324,20 @@ ${new Date(tx.createdAt).toLocaleString()}
                             >
                                 <div className="relative">
                                     <Image
-                                        src="/solana-sol-logo.png"
+                                        src="/logo.png"
                                         alt="Eunoia Logo"
-                                        width={120}
-                                        height={120}
+                                        width={200}
+                                        height={80}
                                         className="object-contain"
                                         priority
                                     />
                                 </div>
-                                <motion.h1
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.3, duration: 0.5 }}
-                                    className="text-4xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-white/80"
-                                >
-                                    EUNOIA
-                                </motion.h1>
                             </motion.div>
-
-                            <motion.div
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.4, duration: 0.5 }}
-                                className="inline-block"
-                            >
-                                <h2 className="text-2xl font-medium tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white/90 to-white/40 pb-1">
-                                    Your AI-Powered Solana Assistant
-                                </h2>
-                                <motion.div
-                                    className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                                    initial={{ width: 0, opacity: 0 }}
-                                    animate={{ width: "100%", opacity: 1 }}
-                                    transition={{ delay: 0.7, duration: 0.8 }}
-                                />
-                            </motion.div>
-
-                             {/* Wallet Connection */}
-                             <motion.div
-                                 className="flex flex-col items-center space-y-4"
-                                 initial={{ opacity: 0 }}
-                                 animate={{ opacity: 1 }}
-                                 transition={{ delay: 0.8 }}
-                             >
-                                 <WalletMultiButton className="!bg-purple-600/20 !text-white hover:!bg-purple-600/30 !border-purple-500/30 !backdrop-blur-sm" />
-                                 {walletError && (
-                                     <div className="text-sm text-red-400 bg-red-500/20 px-3 py-2 rounded-lg backdrop-blur-sm max-w-md text-center">
-                                         <div className="font-medium mb-1">⚠️ Connection Issue</div>
-                                         <div className="text-xs text-red-300">{walletError}</div>
-                                         {walletError.includes('stale permissions') && (
-                                             <div className="text-xs text-red-200 mt-2 p-2 bg-red-600/20 rounded">
-                                                 💡 Quick Fix: Go to your wallet settings → Connected Apps → Revoke access for this site → Try connecting again
-                                             </div>
-                                         )}
-                                     </div>
-                                 )}
-                                 {connected && publicKey && (
-                                     <div className="text-sm text-white/60">
-                                         Connected: {publicKey.toString().slice(0, 8)}...{publicKey.toString().slice(-8)}
-                                     </div>
-                                 )}
-                                 {balance !== null && (
-                                     <div className="px-4 py-2 bg-gradient-to-r from-green-500/30 to-emerald-500/30 rounded-lg text-green-300 font-medium backdrop-blur-sm border border-green-400/20 shadow-lg shadow-green-500/10">
-                                         <div className="flex items-center space-x-2">
-                                             <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                                             <span className="text-green-200">{balance.toFixed(4)}</span>
-                                             <span className="text-green-300 font-bold">SOL</span>
-                                         </div>
-                                     </div>
-                                 )}
-                                 
-                                 {/* Telegram Bot Link */}
-                                 <motion.a
-                                     href={(() => {
-                                       const url = process.env.NEXT_PUBLIC_TELEGRAM_BOT_URL || "https://t.me/askmerlin_bot";
-                                       // Handle different URL formats
-                                       if (url.startsWith('http://') || url.startsWith('https://')) {
-                                         return url;
-                                       } else if (url.startsWith('t.me/')) {
-                                         return `https://${url}`;
-                                       } else if (url.startsWith('@')) {
-                                         return `https://t.me/${url.slice(1)}`;
-                                       } else {
-                                         // If it's just the bot username, add t.me/
-                                         return `https://t.me/${url}`;
-                                       }
-                                     })()}
-                                     target="_blank"
-                                     rel="noopener noreferrer"
-                                     initial={{ opacity: 0, y: 10 }}
-                                     animate={{ opacity: 1, y: 0 }}
-                                     transition={{ delay: 0.9 }}
-                                     whileHover={{ scale: 1.05 }}
-                                     whileTap={{ scale: 0.95 }}
-                                     className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-500/30 to-cyan-500/30 hover:from-blue-500/40 hover:to-cyan-500/40 rounded-lg text-white font-medium backdrop-blur-sm border border-blue-400/30 shadow-lg transition-all duration-200"
-                                 >
-                                     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                         <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
-                                     </svg>
-                                     <span>Try Telegram Bot</span>
-                                 </motion.a>
-
-                                 {/* Contact Address */}
-                                 <motion.div
-                                     initial={{ opacity: 0, y: 10 }}
-                                     animate={{ opacity: 1, y: 0 }}
-                                     transition={{ delay: 1.0 }}
-                                     className="flex flex-col items-center space-y-2"
-                                 >
-                                     <div className="text-xs text-white/50 font-medium uppercase tracking-wider">
-                                         Contact Address
-                                     </div>
-                                     <motion.button
-                                         onClick={async () => {
-                                             const address = "Fjy7UuLuumdK7RmeLtUsCeN2fKmhqucyHUsVm5Fopump";
-                                             try {
-                                                 await navigator.clipboard.writeText(address);
-                                                 setCopied(true);
-                                                 setTimeout(() => setCopied(false), 2000);
-                                             } catch (err) {
-                                                 console.error('Failed to copy:', err);
-                                             }
-                                         }}
-                                         whileHover={{ scale: 1.02 }}
-                                         whileTap={{ scale: 0.98 }}
-                                         className="group relative flex items-center space-x-3 px-5 py-3 bg-gradient-to-r from-purple-500/20 via-violet-500/20 to-purple-500/20 hover:from-purple-500/30 hover:via-violet-500/30 hover:to-purple-500/30 rounded-xl text-white font-mono text-sm backdrop-blur-sm border border-purple-400/30 hover:border-purple-400/50 shadow-lg transition-all duration-300"
-                                     >
-                                         <Mail className="w-4 h-4 text-purple-300 group-hover:text-purple-200 transition-colors" />
-                                         <span className="text-white/90 group-hover:text-white transition-colors">
-                                             Fjy7UuLuumdK7RmeLtUsCeN2fKmhqucyHUsVm5Fopump
-                                         </span>
-                                         <motion.div
-                                             initial={false}
-                                             animate={{ scale: copied ? [1, 1.2, 1] : 1 }}
-                                             transition={{ duration: 0.3 }}
-                                         >
-                                             {copied ? (
-                                                 <Check className="w-4 h-4 text-green-400" />
-                                             ) : (
-                                                 <Copy className="w-4 h-4 text-white/50 group-hover:text-white/70 transition-colors" />
-                                             )}
-                                         </motion.div>
-                                         {copied && (
-                                             <motion.div
-                                                 initial={{ opacity: 0, y: -10 }}
-                                                 animate={{ opacity: 1, y: 0 }}
-                                                 exit={{ opacity: 0, y: -10 }}
-                                                 className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-green-500/90 text-white text-xs font-medium rounded-lg backdrop-blur-sm whitespace-nowrap shadow-lg"
-                                             >
-                                                 Copied!
-                                             </motion.div>
-                                         )}
-                                     </motion.button>
-                                 </motion.div>
-                             </motion.div>
                         </div>
-
 
                         {/* Input Area for Initial State */}
                         <motion.div
-                            className="relative backdrop-blur-2xl bg-black/40 rounded-2xl border border-purple-500/20 shadow-2xl"
+                            className="relative backdrop-blur-2xl bg-black/40 rounded-2xl border border-green-500/20 shadow-2xl w-full max-w-5xl mx-auto"
                             initial={{ scale: 0.98 }}
                             animate={{ scale: 1 }}
                             transition={{ delay: 0.1 }}
@@ -1454,23 +1354,6 @@ ${new Date(tx.createdAt).toLocaleString()}
                                             placeholder="Send SOL, check balance, or ask about Solana..."
                                             className="w-full"
                                         />
-                                        
-                                        <motion.button
-                                            type="button"
-                                            onClick={() => setShowCommandPalette(!showCommandPalette)}
-                                            className="absolute right-3 top-1/2 -translate-y-1/2 p-1 transition-colors"
-                                            whileHover={{ scale: 1.05 }}
-                                            whileTap={{ scale: 0.95 }}
-                                            data-command-button
-                                        >
-                                            <Image 
-                                                src="/solana-sol-logo.png" 
-                                                alt="Eunoia" 
-                                                width={24}
-                                                height={24}
-                                                className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity"
-                                            />
-                                        </motion.button>
                                     </div>
 
                                     <motion.button
@@ -1483,7 +1366,7 @@ ${new Date(tx.createdAt).toLocaleString()}
                                             "px-4 py-2 rounded-lg text-sm font-medium transition-all",
                                             isTyping || !value.trim()
                                                 ? "bg-white/10 text-white/50 cursor-not-allowed"
-                                                : "bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 shadow-lg"
+                                                : "bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 shadow-lg shadow-green-500/20"
                                         )}
                                     >
                                         {isTyping ? (
@@ -1502,19 +1385,19 @@ ${new Date(tx.createdAt).toLocaleString()}
                             </div>
                         </motion.div>
                     </motion.div>
-                </div>
+                </motion.div>
             ) : (
-                // Chat started: new layout
+                // Chat started: new layout - animates down from center
                 <motion.div
-                    initial={{ y: '100vh', opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ type: "spring", stiffness: 100, damping: 20 }}
-                    className="relative z-10 w-full max-w-4xl h-[85vh] flex flex-col rounded-2xl border border-purple-500/20 shadow-2xl bg-black/40 backdrop-blur-2xl"
+                    initial={{ y: '50vh', opacity: 0, scale: 0.9 }}
+                    animate={{ y: 0, opacity: 1, scale: 1 }}
+                    transition={{ type: "spring", stiffness: 80, damping: 25, duration: 0.6 }}
+                    className="relative z-10 w-full max-w-6xl h-[85vh] flex flex-col rounded-2xl border border-green-500/20 shadow-2xl bg-black/40 backdrop-blur-2xl mx-auto"
                 >
                     {/* Top Bar for Wallet */}
-                     <div className="flex items-center justify-between p-4 border-b border-purple-500/20">
+                     <div className="flex items-center justify-between p-4 border-b border-green-500/20">
                          <div className="flex items-center space-x-4">
-                             <WalletMultiButton className="!bg-purple-600/20 !text-white hover:!bg-purple-600/30 !border-purple-500/30 !h-9 !px-4 !text-sm !backdrop-blur-sm" />
+                             <WalletMultiButton />
                              {walletError && (
                                  <div className="text-xs text-red-400 bg-red-500/20 px-2 py-1 rounded backdrop-blur-sm max-w-[300px] text-center">
                                      <div className="font-medium">⚠️ {walletError.split('.')[0]}</div>
@@ -1527,15 +1410,15 @@ ${new Date(tx.createdAt).toLocaleString()}
                              )}
                              {connected && publicKey && (
                                  <div className="flex items-center space-x-3 text-sm">
-                                     <div className="px-3 py-1.5 bg-purple-500/20 rounded-lg text-white/80 backdrop-blur-sm">
+                                     <div className="px-3 py-1.5 bg-green-500/20 rounded-lg text-white/80 backdrop-blur-sm">
                                          {publicKey.toString().slice(0, 4)}...{publicKey.toString().slice(-4)}
                                      </div>
                                      {balance !== null && (
-                                         <div className="px-3 py-1.5 bg-gradient-to-r from-green-500/30 to-emerald-500/30 rounded-lg text-green-300 font-medium backdrop-blur-sm border border-green-400/20 shadow-lg shadow-green-500/10">
-                                             <div className="flex items-center space-x-1">
-                                                 <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                                                 <span className="text-green-200">{balance.toFixed(4)}</span>
-                                                 <span className="text-green-300 font-bold">SOL</span>
+                                         <div className="flex items-center space-x-1.5">
+                                             <div className="w-1.5 h-1.5 bg-green-400 rounded-full"></div>
+                                             <div className="flex items-baseline space-x-1 font-mono">
+                                                 <span className="text-white/70 text-xs font-medium">{balance.toFixed(4)}</span>
+                                                 <span className="text-white/60 text-xs">SOL</span>
                                              </div>
                                          </div>
                                      )}
@@ -1577,8 +1460,8 @@ ${new Date(tx.createdAt).toLocaleString()}
                                     className={cn(
                                         "max-w-[75%] p-4 rounded-2xl",
                                         msg.role === 'user'
-                                            ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white"
-                                            : "bg-black/40 text-white/90 border border-purple-500/30 backdrop-blur-sm"
+                                            ? "bg-gradient-to-r from-green-600 to-emerald-600 text-white"
+                                            : "bg-black/40 text-white/90 border border-green-500/30 backdrop-blur-sm"
                                     )}
                                 >
                                     <div dangerouslySetInnerHTML={{ __html: msg.content }} />
@@ -1588,7 +1471,7 @@ ${new Date(tx.createdAt).toLocaleString()}
                     </div>
 
                     {/* Input Area with OrbInput */}
-                    <div className="p-6 border-t border-purple-500/20 bg-black/20">
+                    <div className="p-6 border-t border-green-500/20 bg-black/20">
                         <div className="flex items-center space-x-4">
                             <div className="flex-1 relative">
                                 <OrbInput
@@ -1599,23 +1482,6 @@ ${new Date(tx.createdAt).toLocaleString()}
                                     onBlur={() => setInputFocused(false)}
                                     className="w-full"
                                 />
-                                
-                                <motion.button
-                                    type="button"
-                                    onClick={() => setShowCommandPalette(!showCommandPalette)}
-                                    className="absolute right-20 top-1/2 -translate-y-1/2 p-1 transition-colors z-10"
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    data-command-button
-                                >
-                                    <Image 
-                                        src="/solana-sol-logo.png" 
-                                        alt="Eunoia" 
-                                        width={24}
-                                        height={24}
-                                        className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity"
-                                    />
-                                </motion.button>
                             </div>
 
                             <motion.button
@@ -1627,8 +1493,8 @@ ${new Date(tx.createdAt).toLocaleString()}
                                 className={cn(
                                     "px-6 py-3 rounded-xl text-sm font-medium transition-all",
                                     isTyping || !value.trim()
-                                        ? "bg-purple-500/20 text-white/50 cursor-not-allowed"
-                                        : "bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700 shadow-lg backdrop-blur-sm"
+                                        ? "bg-green-500/20 text-white/50 cursor-not-allowed"
+                                        : "bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 shadow-lg shadow-green-500/20 backdrop-blur-sm"
                                 )}
                             >
                                 {isTyping ? (
@@ -1653,7 +1519,7 @@ ${new Date(tx.createdAt).toLocaleString()}
                 {showCommandPalette && (
                     <motion.div 
                         ref={commandPaletteRef}
-                        className="absolute left-4 right-4 bottom-full mb-2 backdrop-blur-xl bg-black/90 rounded-lg z-50 shadow-lg border border-purple-500/30 overflow-hidden"
+                        className="absolute left-4 right-4 bottom-full mb-2 backdrop-blur-xl bg-black/90 rounded-lg z-50 shadow-lg border border-green-500/30 overflow-hidden"
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 10 }}
@@ -1689,6 +1555,46 @@ ${new Date(tx.createdAt).toLocaleString()}
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            {/* Footer with Telegram and Docs buttons */}
+            <footer className="fixed bottom-0 left-0 right-0 z-40 border-t border-green-500/20 bg-black/60 backdrop-blur-md">
+                <div className="container mx-auto px-4 py-3">
+                    <div className="flex items-center justify-center space-x-4">
+                        {/* Telegram Button */}
+                        <motion.a
+                            href={(() => {
+                              const url = process.env.NEXT_PUBLIC_TELEGRAM_BOT_URL || "https://t.me/euoniacomp_bot";
+                              if (url.startsWith('http://') || url.startsWith('https://')) {
+                                return url;
+                              } else if (url.startsWith('t.me/')) {
+                                return `https://${url}`;
+                              } else if (url.startsWith('@')) {
+                                return `https://t.me/${url.slice(1)}`;
+                              } else {
+                                return `https://t.me/${url}`;
+                              }
+                            })()}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center space-x-2 text-white/70 hover:text-white transition-colors duration-200"
+                        >
+                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+                            </svg>
+                            <span className="text-sm">Telegram Bot</span>
+                        </motion.a>
+
+                        {/* Docs Button */}
+                        <a
+                            href="/docs"
+                            className="flex items-center space-x-2 text-white/70 hover:text-white transition-colors duration-200"
+                        >
+                            <FileText className="w-4 h-4" />
+                            <span className="text-sm">Documentation</span>
+                        </a>
+                    </div>
+                </div>
+            </footer>
         </div>
     );
 }

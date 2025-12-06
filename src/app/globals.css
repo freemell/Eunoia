@@ -49,6 +49,15 @@
   50% { opacity: 0.7; }
 }
 
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.animate-shimmer {
+  animation: shimmer 3s ease-in-out infinite;
+}
+
 :root {
   --radius: 0.625rem;
   --background: oklch(0.05 0 0);
@@ -132,4 +141,82 @@
   max-width: 100vw;
   max-height: 100vh;
   box-sizing: border-box;
+}
+
+/* Wallet Adapter Button Styling - Cyber Theme */
+.wallet-adapter-button {
+  background: linear-gradient(to right, rgba(34, 197, 94, 0.9), rgba(16, 185, 129, 0.9)) !important;
+  color: white !important;
+  border: 1px solid rgba(34, 197, 94, 0.5) !important;
+  border-radius: 0.75rem !important;
+  padding: 0.5rem 1rem !important;
+  font-weight: 500 !important;
+  font-size: 0.875rem !important;
+  transition: all 0.3s ease !important;
+  backdrop-filter: blur(12px) !important;
+  box-shadow: 0 4px 6px -1px rgba(34, 197, 94, 0.2), 0 2px 4px -1px rgba(34, 197, 94, 0.1) !important;
+}
+
+.wallet-adapter-button:hover:not([disabled]) {
+  background: linear-gradient(to right, rgba(34, 197, 94, 1), rgba(16, 185, 129, 1)) !important;
+  border-color: rgba(34, 197, 94, 0.7) !important;
+  box-shadow: 0 10px 15px -3px rgba(34, 197, 94, 0.3), 0 4px 6px -2px rgba(34, 197, 94, 0.2) !important;
+  transform: translateY(-1px) !important;
+}
+
+.wallet-adapter-button:active:not([disabled]) {
+  transform: translateY(0) !important;
+}
+
+.wallet-adapter-button[disabled] {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+}
+
+/* Wallet Adapter Button Text */
+.wallet-adapter-button-start-icon,
+.wallet-adapter-button-end-icon {
+  color: white !important;
+}
+
+/* Wallet Adapter Dropdown Menu */
+.wallet-adapter-dropdown {
+  background: rgba(0, 0, 0, 0.95) !important;
+  border: 1px solid rgba(34, 197, 94, 0.3) !important;
+  border-radius: 0.75rem !important;
+  backdrop-filter: blur(12px) !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 0 20px rgba(34, 197, 94, 0.2) !important;
+}
+
+.wallet-adapter-dropdown-list {
+  padding: 0.5rem !important;
+}
+
+.wallet-adapter-dropdown-list-item {
+  color: rgba(255, 255, 255, 0.9) !important;
+  border-radius: 0.5rem !important;
+  padding: 0.75rem 1rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.wallet-adapter-dropdown-list-item:hover {
+  background: rgba(34, 197, 94, 0.2) !important;
+  color: white !important;
+}
+
+.wallet-adapter-dropdown-list-item:not([disabled]):hover {
+  background: rgba(34, 197, 94, 0.3) !important;
+}
+
+/* Connected State - Show wallet address with cyber theme */
+.wallet-adapter-button-trigger {
+  background: rgba(0, 0, 0, 0.8) !important;
+  border: 1px solid rgba(34, 197, 94, 0.5) !important;
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.wallet-adapter-button-trigger:hover {
+  background: rgba(0, 0, 0, 0.9) !important;
+  border-color: rgba(34, 197, 94, 0.7) !important;
+  color: white !important;
 }

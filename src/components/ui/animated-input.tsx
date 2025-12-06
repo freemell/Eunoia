@@ -110,11 +110,15 @@ export function OrbInput({
     onBlur?.();
   };
 
+  const isTypingInInput = value.length > 0;
+
   return (
     <div className={`relative ${className || ""}`}>
       <div
-        className={`flex items-center gap-3 p-4 bg-black/60 shadow-lg transition-all duration-300 ease-out rounded-full border border-gray-300/50 backdrop-blur-sm ${
-          isFocused ? "shadow-xl scale-[1.02] border-gray-500/70" : "shadow-lg"
+        className={`flex items-center gap-3 p-4 bg-black/60 shadow-lg transition-all duration-300 ease-out rounded-full border backdrop-blur-sm ${
+          isFocused || isTypingInInput
+            ? "shadow-xl scale-[1.02] border-green-500/70 shadow-green-500/50 ring-2 ring-green-500/30"
+            : "shadow-lg border-gray-300/50"
         }`}
       >
         <div className="relative flex-shrink-0">
@@ -127,7 +131,7 @@ export function OrbInput({
           </div>
         </div>
         <div className="w-px h-10 bg-gray-600/50" />
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 w-full" style={{ width: '100%', maxWidth: '1200px' }}>
           <input
             data-testid="orb-input"
             type="text"
@@ -136,7 +140,7 @@ export function OrbInput({
             onKeyDown={onKeyDown}
             onFocus={handleFocus}
             onBlur={handleBlur}
-            placeholder={placeholder || `${displayedText}${isTyping ? "|" : ""}`}
+            placeholder={value ? placeholder : `${displayedText}${isTyping ? "|" : ""}`}
             aria-label="Ask a question"
             className="w-full text-lg text-white placeholder-gray-400 bg-transparent border-none outline-none font-light"
             {...props}
