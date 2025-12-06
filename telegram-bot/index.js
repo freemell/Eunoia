@@ -28,7 +28,7 @@ if (!process.env.TELEGRAM_BOT_TOKEN) {
 }
 
 // Get bot username for mentions
-let botUsername = 'askmerlin_bot'; // Default fallback
+let botUsername = 'askeunoia_bot'; // Default fallback
 bot.api.getMe().then(me => {
   botUsername = me.username;
   console.log(`✅ Bot username: @${botUsername}`);
@@ -68,7 +68,7 @@ async function handleCallbackQuery(ctx) {
     switch (callbackData) {
       case 'main_menu':
         clearSession(telegramId);
-        await ctx.editMessageText('Welcome to Merlin! Choose an action:', {
+        await ctx.editMessageText('Welcome to Eunoia! Choose an action:', {
           reply_markup: getMainMenu()
         });
         break;
@@ -83,10 +83,10 @@ async function handleCallbackQuery(ctx) {
 
       case 'swap':
     await ctx.editMessageText(
-      `🔄 *How to Swap with Merlin*\n\n` +
-      `1. Confirm your Merlin wallet holds enough SOL for the swap and fees.\n` +
-      `2. Ask Merlin in chat, for example: "swap 0.1 SOL to USDC" or "buy 25 bonk".\n` +
-      `3. For selling, you can say "sell 50% BONK" and Merlin calculates the amount.\n` +
+      `🔄 *How to Swap with Eunoia*\n\n` +
+      `1. Confirm your Eunoia wallet holds enough SOL for the swap and fees.\n` +
+      `2. Ask Eunoia in chat, for example: "swap 0.1 SOL to USDC" or "buy 25 bonk".\n` +
+      `3. For selling, you can say "sell 50% BONK" and Eunoia calculates the amount.\n` +
       `4. Review the token mint address to avoid scams; swaps execute immediately.\n\n` +
       `⚠️ Always double-check token symbols or mint addresses before swapping.`,
       {
@@ -98,9 +98,9 @@ async function handleCallbackQuery(ctx) {
 
       case 'bridge':
     await ctx.editMessageText(
-      `🌉 *How to Bridge with Merlin*\n\n` +
-      `1. Ensure your Merlin wallet holds at least *0.1 SOL* for bridge and network fees.\n` +
-      `2. Ask Merlin in chat, for example: "bridge 0.1 SOL from solana to bsc 0xYourEVMAddress".\n` +
+      `🌉 *How to Bridge with Eunoia*\n\n` +
+      `1. Ensure your Eunoia wallet holds at least *0.1 SOL* for bridge and network fees.\n` +
+      `2. Ask Eunoia in chat, for example: "bridge 0.1 SOL from solana to bsc 0xYourEVMAddress".\n` +
       `3. Double-check the destination address—bridge transfers cannot be reversed.\n` +
       `4. Leave a small SOL buffer so future transactions and swaps still succeed.\n\n` +
       `⚠️ Always verify chain names and addresses before bridging to avoid losing funds.`,
@@ -183,7 +183,7 @@ async function handleMessage(ctx) {
           return;
         case '/help':
           await ctx.reply(
-            `🧙‍♂️ *Merlin Bot Commands*\n\n` +
+            `✨ *Eunoia Bot Commands*\n\n` +
             `*/start* - Start the bot\n` +
             `*/wallet* - Manage your wallet\n` +
             `*/balance* - Check your SOL balance\n` +
@@ -257,7 +257,7 @@ export { handleMessage, handleCallbackQuery };
 
 // Start bot (only if not in webhook mode)
 if (process.env.USE_WEBHOOK !== 'true') {
-  console.log('🤖 Starting Merlin Telegram Bot (Polling mode)...');
+  console.log('🤖 Starting Eunoia Telegram Bot (Polling mode)...');
   bot.start({
     onStart: (botInfo) => {
       console.log(`✅ Bot started successfully! @${botInfo.username}`);

@@ -1,7 +1,7 @@
 {
-  "name": "merlin-telegram-bot",
+  "name": "eunoia-telegram-bot",
   "version": "1.0.0",
-  "description": "Merlin Telegram Bot - Standalone",
+  "description": "Eunoia Telegram Bot - Standalone",
   "main": "index.js",
   "type": "module",
   "scripts": {

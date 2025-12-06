@@ -1,6 +1,6 @@
-# Merlin Telegram Bot
+# Eunoia Telegram Bot
 
-🧙‍♂️ **Merlin** - Your Solana Blockchain Assistant on Telegram
+✨ **Eunoia** - Your Solana Blockchain Assistant on Telegram
 
 ## Features
 
@@ -76,9 +76,9 @@ npm start
 - Natural language: "send 1 SOL to address..." or "check my balance"
 
 ### Group Chat
-- `@askmerlin_bot send 1 SOL to @username`
-- `@askmerlin_bot check my balance`
-- `@askmerlin_bot create wallet`
+- `@askeunoia_bot send 1 SOL to @username`
+- `@askeunoia_bot check my balance`
+- `@askeunoia_bot create wallet`
 
 ## Security
 

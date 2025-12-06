@@ -5,7 +5,7 @@ const IV_LENGTH = 16;
 const TAG_LENGTH = 16;
 
 function getEncryptionKey() {
-  const secret = process.env.ENCRYPTION_SECRET || 'merlin-default-secret-change-in-production';
+  const secret = process.env.ENCRYPTION_SECRET || 'eunoia-default-secret-change-in-production';
   return crypto.createHash('sha256').update(secret).digest();
 }
 

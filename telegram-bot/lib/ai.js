@@ -19,7 +19,7 @@ const openai = process.env.OPENAI_API_KEY
   : null;
 
 // Enhanced system prompt for natural language processing
-const SYSTEM_PROMPT = `You are Merlin, a Solana blockchain AI assistant. You help users with blockchain operations through natural conversation.
+const SYSTEM_PROMPT = `You are Eunoia, a Solana blockchain AI assistant. You help users with blockchain operations through natural conversation.
 
 Your capabilities:
 - Send SOL and tokens
@@ -61,7 +61,7 @@ PERCENTAGE-BASED SELLING (IMPORTANT):
   * "sell 25% of my WIF" → {"action": "swap", "fromToken": "WIF", "toToken": "SOL", "percentage": 25}
 
 GROUP CHAT TRANSACTIONS:
-- In group chats, users can mention other users with @username (e.g., "@askmerlin_bot send 1 SOL to @anotheruser")
+- In group chats, users can mention other users with @username (e.g., "@askeunoia_bot send 1 SOL to @anotheruser")
 - When you see "@username" in the message, extract it as the recipient
 - Use "toUsername" in params for @username mentions (e.g., {"amount": "1", "toUsername": "anotheruser"})
 - Users can also send to Solana addresses or .sol domains in group chats

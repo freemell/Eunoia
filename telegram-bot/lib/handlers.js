@@ -1,7 +1,7 @@
 import { processMessageWithAI } from './ai.js';
 import { createTelegramWallet, importTelegramWallet, getTelegramWallet, getTelegramWalletAddress, hasTelegramWallet } from './wallet.js';
 import { sendSOLTransaction, getBalance, swapTokens, getTransactionHistory } from './solana.js';
-import { merlinBridge } from './bridge.js';
+import { eunoiaBridge } from './bridge.js';
 import { InlineKeyboard } from 'grammy';
 import { escapeUsername, safeMarkdown } from './utils.js';
 import { 
@@ -45,10 +45,12 @@ export async function handleStart(ctx, session) {
   const telegramId = ctx.from.id.toString();
   const hasWallet = await hasTelegramWallet(telegramId);
 
-  const welcomeMessage = `🧙‍♂️ *Welcome to Merlin!*\n\n` +
-    `Your Solana Blockchain Assistant\n\n` +
-    `${hasWallet ? '✅ Wallet connected' : '⚠️ No wallet found. Create or import one to get started.'}\n\n` +
-    `Use the buttons below to interact, or chat with me naturally!`;
+  const welcomeMessage = `✨ *Welcome to Eunoia!*\n\n` +
+    `*Your Gateway to the Solana Universe* 🌌\n\n` +
+    `I'm Eunoia, your intelligent blockchain companion. Together, we'll navigate the decentralized world with elegance and precision.\n\n` +
+    `${hasWallet ? '✅ *Your wallet is connected and ready*' : '⚡ *Let\'s begin your journey* - Create or import a wallet to unlock the full power of Solana'}\n\n` +
+    `💬 *Chat naturally* with me, or use the buttons below to explore.\n` +
+    `🚀 *Ready to transcend boundaries?* Let's build something extraordinary.`;
 
   if (hasWallet) {
     await ctx.reply(welcomeMessage, {
@@ -70,7 +72,7 @@ export async function handleBalance(ctx) {
   
   if (!address) {
     const message = isGroup
-      ? '❌ You need to create a wallet first! Say "@askmerlin_bot create wallet" or use /start to create your wallet.'
+      ? '❌ You need to create a wallet first! Say "@askeunoia_bot create wallet" or use /start to create your wallet.'
       : '❌ No wallet found. Please create or import a wallet first.';
     await ctx.reply(message, {
       reply_markup: isGroup ? undefined : getWalletMenu()
@@ -115,7 +117,7 @@ export async function handleHistory(ctx, options = {}) {
 
   if (!address) {
     const message = isGroup
-      ? '❌ You need to create a wallet first! Say "@askmerlin_bot create wallet" or use /start to create your wallet.'
+      ? '❌ You need to create a wallet first! Say "@askeunoia_bot create wallet" or use /start to create your wallet.'
       : '❌ No wallet found. Please create or import a wallet first.';
 
     if (options.edit) {
@@ -193,9 +195,9 @@ export async function handleHistory(ctx, options = {}) {
 }
 
 export async function handleSettings(ctx, options = {}) {
-  const message = `⚙️ *Merlin Settings*\n\n` +
-    `🌐 Website: [askmerlin.dev](https://askmerlin.dev/)\n` +
-    `🐦 Twitter: [@askmerlindev](https://x.com/askmerlindev)\n\n` +
+  const message = `⚙️ *Eunoia Settings*\n\n` +
+    `🌐 Website: [askeunoia.dev](https://askeunoia.dev/)\n` +
+    `🐦 Twitter: [@askeunoiadev](https://x.com/askeunoiadev)\n\n` +
     `More settings coming soon!`;
 
   const payload = {
@@ -282,7 +284,7 @@ export async function handleSendSOL(ctx, session, amount, recipient, recipientUs
   if (!keypair) {
     const isGroup = isGroupChat(ctx);
     const message = isGroup 
-      ? '❌ You need to create a wallet first! Say "@askmerlin_bot create wallet" or use /start to create your wallet.'
+      ? '❌ You need to create a wallet first! Say "@askeunoia_bot create wallet" or use /start to create your wallet.'
       : '❌ No wallet found. Please create or import a wallet first.';
     
     await ctx.reply(message, {
@@ -403,7 +405,7 @@ export async function handleAIAction(ctx, aiResult, session, setSessionFn) {
         if (!hasWallet) {
           const isGroup = isGroupChat(ctx);
           const message = isGroup
-            ? '❌ You need to create a wallet first! Say "@askmerlin_bot create wallet" or use /start to create your wallet.'
+            ? '❌ You need to create a wallet first! Say "@askeunoia_bot create wallet" or use /start to create your wallet.'
             : '❌ No wallet found. Please create or import a wallet first.';
           await ctx.reply(message, {
             reply_markup: isGroup ? undefined : getWalletMenu()
@@ -435,7 +437,7 @@ export async function handleAIAction(ctx, aiResult, session, setSessionFn) {
       const hasWallet = await hasTelegramWallet(telegramId);
       if (!hasWallet) {
         const message = isGroup
-          ? '📱 You need to create a wallet first! Say "@askmerlin_bot create wallet" or use /start to create your wallet.'
+          ? '📱 You need to create a wallet first! Say "@askeunoia_bot create wallet" or use /start to create your wallet.'
           : '📱 You need to create or import a wallet first:';
         await ctx.reply(message, {
           reply_markup: isGroup ? undefined : getWalletMenu()
@@ -462,7 +464,7 @@ export async function handleAIAction(ctx, aiResult, session, setSessionFn) {
         const hasWallet = await hasTelegramWallet(telegramId);
         if (!hasWallet) {
           const message = isGroup
-            ? '❌ You need to create a wallet first! Say "@askmerlin_bot create wallet" or use /start to create your wallet.'
+            ? '❌ You need to create a wallet first! Say "@askeunoia_bot create wallet" or use /start to create your wallet.'
             : '❌ No wallet found. Please create or import a wallet first.';
           await ctx.reply(message, {
             reply_markup: isGroup ? undefined : getWalletMenu()
@@ -545,7 +547,7 @@ export async function handleAIAction(ctx, aiResult, session, setSessionFn) {
         const hasWallet = await hasTelegramWallet(telegramId);
         if (!hasWallet) {
           const message = isGroup
-            ? '❌ You need to create a wallet first! Say "@askmerlin_bot create wallet" or use /start to create your wallet.'
+            ? '❌ You need to create a wallet first! Say "@askeunoia_bot create wallet" or use /start to create your wallet.'
             : '❌ No wallet found. Please create or import a wallet first.';
           await ctx.reply(message, {
             reply_markup: isGroup ? undefined : getWalletMenu()
@@ -563,7 +565,7 @@ export async function handleAIAction(ctx, aiResult, session, setSessionFn) {
         }
 
         // Execute bridge transaction directly (no confirmation)
-        const bridgeResult = await merlinBridge.executeBridge({
+        const bridgeResult = await eunoiaBridge.executeBridge({
           fromChain: params.fromChain,
           toChain: params.toChain,
           token: params.token || 'SOL',

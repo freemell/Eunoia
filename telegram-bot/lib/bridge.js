@@ -34,7 +34,7 @@ const createConnection = () => {
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-export class MerlinBridge {
+export class EunoiaBridge {
   constructor() {
     // Hardcoded to Bungee Exchange public backend (free, keyless access for testing)
     // WARNING: Very limited shared RPS - not suitable for production
@@ -1070,5 +1070,5 @@ export class MerlinBridge {
 }
 
 // Export singleton instance
-export const merlinBridge = new MerlinBridge();
+export const eunoiaBridge = new EunoiaBridge();
 
