@@ -1283,7 +1283,7 @@ ${new Date(tx.createdAt).toLocaleString()}
 
             {/* Conditional rendering based on chatStarted */}
             {!chatStarted ? (
-                // Initial state: Merlin logo, title, command suggestions
+                // Initial state: Eunoia logo, title, command suggestions
                 <div className="w-full max-w-2xl mx-auto relative">
                     <motion.div
                         className="relative z-10 space-y-12"
@@ -1292,7 +1292,7 @@ ${new Date(tx.createdAt).toLocaleString()}
                         transition={{ duration: 0.6, ease: "easeOut" }}
                     >
                         <div className="text-center space-y-6">
-                            {/* Merlin Logo */}
+                            {/* Eunoia Logo */}
                             <motion.div
                                 initial={{ opacity: 0, scale: 0.8 }}
                                 animate={{ opacity: 1, scale: 1 }}
@@ -1315,7 +1315,7 @@ ${new Date(tx.createdAt).toLocaleString()}
                                     transition={{ delay: 0.3, duration: 0.5 }}
                                     className="text-4xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-white/80"
                                 >
-                                    MERLIN
+                                    EUNOIA
                                 </motion.h1>
                             </motion.div>
 
@@ -1326,7 +1326,7 @@ ${new Date(tx.createdAt).toLocaleString()}
                                 className="inline-block"
                             >
                                 <h2 className="text-2xl font-medium tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white/90 to-white/40 pb-1">
-                                    Your Solana Blockchain Assistant
+                                    Your AI-Powered Solana Assistant
                                 </h2>
                                 <motion.div
                                     className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"
@@ -1517,7 +1517,7 @@ ${new Date(tx.createdAt).toLocaleString()}
                                         {isTyping ? (
                                             <div className="flex items-center space-x-2">
                                                 <TypingDots />
-                                                <span>Merlin</span>
+                                                <span>Eunoia</span>
                                             </div>
                                         ) : (
                                             <div className="flex items-center space-x-2">
@@ -1571,7 +1571,7 @@ ${new Date(tx.createdAt).toLocaleString()}
                              )}
                          </div>
                         <div className="flex items-center space-x-3">
-                            <div className="text-lg font-semibold text-white/80">MERLIN</div>
+                            <div className="text-lg font-semibold text-white/80">EUNOIA</div>
                             <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
                             <div className="text-xs text-white/60">
                                 {connected ? "Bridge Ready" : "Connect for Bridge"}
@@ -1587,7 +1587,7 @@ ${new Date(tx.createdAt).toLocaleString()}
                                 animate={{ opacity: 1, y: 0 }}
                                 className="text-center text-white/70 text-xl font-medium mb-6 py-4"
                             >
-                                Merlin is thinking...
+                                Eunoia is thinking...
                             </motion.div>
                         )}
                         {messages.map((msg, index) => (
@@ -1629,7 +1629,7 @@ ${new Date(tx.createdAt).toLocaleString()}
                                     onKeyDown={handleKeyDown}
                                     onFocus={() => setInputFocused(true)}
                                     onBlur={() => setInputFocused(false)}
-                                    placeholder="Ask Merlin anything..."
+                                    placeholder="Ask Eunoia anything..."
                                     className="min-h-[60px] max-h-[200px] resize-none pr-12 bg-black/40 border-purple-500/30 text-white placeholder-white/50 focus:border-purple-500/50 focus:ring-0 backdrop-blur-sm"
                                     containerClassName="relative"
                                     showRing={true}
@@ -1645,7 +1645,7 @@ ${new Date(tx.createdAt).toLocaleString()}
                                 >
                                     <Image 
                                         src="/solana-sol-logo.png" 
-                                        alt="Merlin" 
+                                        alt="Eunoia" 
                                         width={24}
                                         height={24}
                                         className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity"
