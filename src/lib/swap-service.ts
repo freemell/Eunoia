@@ -102,7 +102,7 @@ export async function executeSwap(
         try {
           const { decimals: fetchedDecimals } = await getTokenBalance(userPublicKey, fromToken);
           decimals = fetchedDecimals;
-        } catch (error) {
+        } catch {
           console.warn(`Could not fetch decimals for ${fromToken}, using default: 6`);
         }
       }

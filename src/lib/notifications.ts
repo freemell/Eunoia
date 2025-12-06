@@ -3,10 +3,6 @@
  * Sends alerts when limit orders are executed
  */
 
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
-
 interface LimitOrderNotification {
   orderId: string;
   orderType: 'buy' | 'sell';

@@ -29,7 +29,7 @@ function resolveTokenAddress(tokenIdentifier: string): string {
     // Validate it's a valid Solana public key
     new PublicKey(tokenIdentifier);
     return tokenIdentifier;
-  } catch (error) {
+  } catch {
     throw new Error(`Invalid token identifier: ${tokenIdentifier}. Please provide a valid token symbol or contract address.`);
   }
 }
@@ -85,7 +85,7 @@ export async function POST(req: Request) {
     // Validate wallet address is a valid Solana address
     try {
       new PublicKey(walletAddress);
-    } catch (error) {
+    } catch {
       return NextResponse.json({
         success: false,
         error: 'Invalid wallet address. Please provide a valid Solana address.'
@@ -96,14 +96,14 @@ export async function POST(req: Request) {
     const limitOrder = await prisma.limitOrder.create({
       data: {
         walletAddress,
-        userId: userId || null,
-        telegramId: telegramId || null,
+        ...(userId ? { userId } : {}),
+        ...(telegramId ? { telegramId } : {}),
         tokenAddress: resolvedTokenAddress, // Use resolved address
-        tokenSymbol: tokenSymbol || null,
+        ...(tokenSymbol ? { tokenSymbol } : {}),
         orderType,
         triggerType,
         triggerValue,
-        amount: amount || null,
+        ...(amount ? { amount } : {}),
         amountType: amountType || 'fixed',
         status: 'active',
       },

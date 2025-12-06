@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -18,7 +18,7 @@ export async function GET(req: Request) {
       }, { status: 400 });
     }
 
-    const where: any = {};
+    const where: Prisma.LimitOrderWhereInput = {};
     if (walletAddress) where.walletAddress = walletAddress;
     if (userId) where.userId = userId;
     if (telegramId) where.telegramId = telegramId;

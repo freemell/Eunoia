@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, LimitOrder } from '@prisma/client';
 import { checkLimitOrderCondition } from '@/lib/market-data';
 import { Keypair } from '@solana/web3.js';
 import { getTelegramWallet } from '@/lib/telegram-wallet';
@@ -123,7 +123,7 @@ export async function GET(req: Request) {
   }
 }
 
-async function executeLimitOrder(order: any): Promise<{ success: boolean; txHash?: string; error?: string }> {
+async function executeLimitOrder(order: LimitOrder): Promise<{ success: boolean; txHash?: string; error?: string }> {
   try {
     // Get user's wallet (either from TelegramUser or Wallet model)
     let keypair: Keypair | null = null;
