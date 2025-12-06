@@ -14,32 +14,32 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Merlin - Solana AI Assistant",
-  description: "Your AI-powered Solana blockchain assistant for sending SOL, bridging tokens, and managing your Solana wallet through natural language commands.",
-  keywords: ["Solana", "AI", "Blockchain", "Crypto", "Wallet", "Assistant", "DeFi"],
-  authors: [{ name: "Merlin Team" }],
-  creator: "Merlin",
-  publisher: "Merlin",
+  title: "Eunoia - AI-Powered Solana Assistant",
+  description: "Your AI-powered Solana blockchain assistant for sending SOL, swapping tokens, and managing your Solana wallet through natural language commands.",
+  keywords: ["Solana", "AI", "Blockchain", "Crypto", "Wallet", "Assistant", "DeFi", "Eunoia"],
+  authors: [{ name: "Eunoia Team" }],
+  creator: "Eunoia",
+  publisher: "Eunoia",
   formatDetection: {
     email: false,
     address: false,
     telephone: false,
   },
-  metadataBase: new URL('http://localhost:3005'),
+  metadataBase: new URL('https://eunoia.vercel.app'),
   alternates: {
     canonical: '/',
   },
   openGraph: {
-    title: "Merlin - Solana AI Assistant",
-    description: "Your AI-powered Solana blockchain assistant for sending SOL, bridging tokens, and managing your Solana wallet through natural language commands.",
-    url: 'http://localhost:3005',
-    siteName: 'Merlin',
+    title: "Eunoia - AI-Powered Solana Assistant",
+    description: "Your AI-powered Solana blockchain assistant for sending SOL, swapping tokens, and managing your Solana wallet through natural language commands.",
+    url: 'https://eunoia.vercel.app',
+    siteName: 'Eunoia',
     images: [
       {
-        url: '/merlin-preview.png',
+        url: '/icon.png',
         width: 1200,
         height: 630,
-        alt: 'Merlin - Solana AI Assistant Interface',
+        alt: 'Eunoia - AI-Powered Solana Assistant Interface',
       },
     ],
     locale: 'en_US',
@@ -47,10 +47,10 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: "Merlin - Solana AI Assistant",
-    description: "Your AI-powered Solana blockchain assistant for sending SOL, bridging tokens, and managing your Solana wallet through natural language commands.",
-    images: ['/merlin-preview.png'],
-    creator: '@merlin',
+    title: "Eunoia - AI-Powered Solana Assistant",
+    description: "Your AI-powered Solana blockchain assistant for sending SOL, swapping tokens, and managing your Solana wallet through natural language commands.",
+    images: ['/icon.png'],
+    creator: '@eunoia',
   },
   robots: {
     index: true,

@@ -1,21 +1,26 @@
-# Environment Variables for Merlin AI
-# Copy this content to your .env file
+# Environment Variables for Eunoia
+# Copy this content to your .env file and fill in your actual values
 
 # Telegram Bot Configuration
-TELEGRAM_BOT_TOKEN=8068396024:AAEz8Ykj4XrO9FHy4qz-GTfOD5PwqAULlaI
-NEXT_PUBLIC_TELEGRAM_BOT_URL=https://t.me/askmerlin_bot
+TELEGRAM_BOT_TOKEN=your_telegram_bot_token_here
+NEXT_PUBLIC_TELEGRAM_BOT_URL=https://t.me/your_bot_username
 
-# Database (Neon PostgreSQL)
-DATABASE_URL=postgresql://neondb_owner:npg_F13owDGhjdKb@ep-holy-voice-ah6510u0-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+# Database (Neon PostgreSQL or other PostgreSQL provider)
+DATABASE_URL=postgresql://user:password@host:port/database?sslmode=require
 
-# Security
-ENCRYPTION_SECRET=590a64fc3c8f6b4f57c0fde30dcac4374ade7e370a171ee212d52e07cd7ea033
+# Security (Generate a strong random secret key)
+ENCRYPTION_SECRET=your_encryption_secret_here_min_32_characters
 
 # AI Services
-OPENAI_API_KEY=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
-GROQ_API_KEY=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
+OPENAI_API_KEY=your_openai_api_key_here
+GROQ_API_KEY=your_groq_api_key_here
 
 # Solana Configuration
 SOLANA_RPC_URL=https://api.mainnet-beta.solana.com
 NEXT_PUBLIC_SOLANA_RPC_URL=https://api.mainnet-beta.solana.com
 
+# Optional: Cron Secret (for protecting cron endpoints)
+CRON_SECRET=your_cron_secret_here
+
+# Optional: Base URL (for API calls)
+NEXT_PUBLIC_BASE_URL=https://your-app.vercel.app

@@ -1301,8 +1301,8 @@ ${new Date(tx.createdAt).toLocaleString()}
                             >
                                 <div className="relative">
                                     <Image
-                                        src="/merlin-logo.png"
-                                        alt="Merlin Logo"
+                                        src="/solana-sol-logo.png"
+                                        alt="Eunoia Logo"
                                         width={120}
                                         height={120}
                                         className="object-contain"
@@ -1492,8 +1492,8 @@ ${new Date(tx.createdAt).toLocaleString()}
                                             data-command-button
                                         >
                                             <Image 
-                                                src="/merlin-logo.png" 
-                                                alt="Merlin" 
+                                                src="/solana-sol-logo.png" 
+                                                alt="Eunoia" 
                                                 width={24}
                                                 height={24}
                                                 className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity"
