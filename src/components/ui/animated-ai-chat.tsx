@@ -1644,7 +1644,7 @@ ${new Date(tx.createdAt).toLocaleString()}
                                     data-command-button
                                 >
                                     <Image 
-                                        src="/merlin-logo.png" 
+                                        src="/solana-sol-logo.png" 
                                         alt="Merlin" 
                                         width={24}
                                         height={24}
