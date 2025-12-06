@@ -5,8 +5,8 @@
 TELEGRAM_BOT_TOKEN=8068396024:AAEz8Ykj4XrO9FHy4qz-GTfOD5PwqAULlaI
 NEXT_PUBLIC_TELEGRAM_BOT_URL=https://t.me/askmerlin_bot
 
-# Database
-DATABASE_URL=file:./dev.db
+# Database (Neon PostgreSQL)
+DATABASE_URL=postgresql://neondb_owner:npg_F13owDGhjdKb@ep-holy-voice-ah6510u0-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
 
 # Security
 ENCRYPTION_SECRET=590a64fc3c8f6b4f57c0fde30dcac4374ade7e370a171ee212d52e07cd7ea033

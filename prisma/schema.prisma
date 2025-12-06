@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -50,7 +50,7 @@ model Wallet {
 }
 
 model TelegramUser {
-  id           Int      @id @default(autoincrement())
+  id           String   @id @default(cuid())
   telegramId   String   @unique
   username     String?
   firstName    String?
