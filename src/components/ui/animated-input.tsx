@@ -6,6 +6,7 @@ export function OrbInput({
   onChange,
   onFocus,
   onBlur,
+  onKeyDown,
   placeholder,
   className,
   ...props
@@ -14,6 +15,7 @@ export function OrbInput({
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onFocus?: () => void;
   onBlur?: () => void;
+  onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   placeholder?: string;
   className?: string;
   [key: string]: any;
@@ -111,12 +113,12 @@ export function OrbInput({
   return (
     <div className={`relative ${className || ""}`}>
       <div
-        className={`flex items-center gap-4 p-6 bg-black shadow-lg transition-all duration-300 ease-out rounded-full border border-gray-300 ${
-          isFocused ? "shadow-xl scale-[1.02] border-gray-600" : "shadow-lg"
+        className={`flex items-center gap-3 p-4 bg-black/60 shadow-lg transition-all duration-300 ease-out rounded-full border border-gray-300/50 backdrop-blur-sm ${
+          isFocused ? "shadow-xl scale-[1.02] border-gray-500/70" : "shadow-lg"
         }`}
       >
         <div className="relative flex-shrink-0">
-          <div className="w-16 h-16 rounded-full overflow-hidden transition-all duration-300 scale-100">
+          <div className="w-12 h-12 rounded-full overflow-hidden transition-all duration-300 scale-100">
             <img
               src="https://media.giphy.com/media/26gsuUjoEBmLrNBxC/giphy.gif"
               alt="Animated orb"
@@ -124,18 +126,19 @@ export function OrbInput({
             />
           </div>
         </div>
-        <div className="w-px h-12 bg-gray-600" />
-        <div className="flex-1 w-[500px]">
+        <div className="w-px h-10 bg-gray-600/50" />
+        <div className="flex-1 min-w-0">
           <input
             data-testid="orb-input"
             type="text"
             value={value}
             onChange={onChange}
+            onKeyDown={onKeyDown}
             onFocus={handleFocus}
             onBlur={handleBlur}
             placeholder={placeholder || `${displayedText}${isTyping ? "|" : ""}`}
             aria-label="Ask a question"
-            className="w-full text-xl text-white placeholder-gray-400 bg-transparent border-none outline-none font-light"
+            className="w-full text-lg text-white placeholder-gray-400 bg-transparent border-none outline-none font-light"
             {...props}
           />
         </div>

@@ -19,6 +19,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { Waves } from "@/components/ui/waves-background";
 import CyberMatrixHero from "@/components/ui/cyber-matrix-hero";
+import { OrbInput } from "@/components/ui/animated-input";
 import * as React from "react"
 import Image from "next/image";
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
@@ -173,10 +174,7 @@ export function AnimatedAIChat() {
     const [pendingAction, setPendingAction] = useState<{type: string, params: {amount: string | number, to?: string, domain?: string, fromChain?: string, toChain?: string, token?: string, toAddress?: string, fromToken?: string, toToken?: string}} | null>(null);
     const [showApproval, setShowApproval] = useState(false);
     const [copied, setCopied] = useState(false);
-    const { textareaRef, adjustHeight } = useAutoResizeTextarea({
-        minHeight: 60,
-        maxHeight: 200,
-    });
+    // Removed textareaRef since we're using OrbInput now
 
     // Auto-scroll chat container
     useEffect(() => {
@@ -505,7 +503,7 @@ export function AnimatedAIChat() {
         },
     ], []);
 
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (showCommandPalette) {
             if (e.key === 'ArrowDown') {
                 e.preventDefault();
@@ -859,7 +857,7 @@ export function AnimatedAIChat() {
         if (value.trim()) {
             const userMessage = value.trim();
             setValue("");
-            adjustHeight(true);
+            // Height adjustment not needed with OrbInput
             
             // Add user message to chat
             setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
@@ -1444,23 +1442,17 @@ ${new Date(tx.createdAt).toLocaleString()}
                             animate={{ scale: 1 }}
                             transition={{ delay: 0.1 }}
                         >
-                            <div className="p-6">
-                                <div className="flex items-end space-x-3">
+                            <div className="p-4">
+                                <div className="flex items-center space-x-3">
                                     <div className="flex-1 relative">
-                                        <Textarea
-                                            ref={textareaRef}
+                                        <OrbInput
                                             value={value}
-                                            onChange={(e) => {
-                                                setValue(e.target.value);
-                                                adjustHeight();
-                                            }}
+                                            onChange={(e) => setValue(e.target.value)}
                                             onKeyDown={handleKeyDown}
                                             onFocus={() => setInputFocused(true)}
                                             onBlur={() => setInputFocused(false)}
                                             placeholder="Send SOL, check balance, or ask about Solana..."
-                                            className="min-h-[60px] max-h-[200px] resize-none pr-12 bg-white/[0.05] border-white/10 text-white placeholder-white/50 focus:border-white/20 focus:ring-0"
-                                            containerClassName="relative"
-                                            showRing={true}
+                                            className="w-full"
                                         />
                                         
                                         <motion.button
@@ -1595,30 +1587,23 @@ ${new Date(tx.createdAt).toLocaleString()}
                         ))}
                     </div>
 
-                    {/* Input Area */}
+                    {/* Input Area with OrbInput */}
                     <div className="p-6 border-t border-purple-500/20 bg-black/20">
-                        <div className="flex items-end space-x-4">
+                        <div className="flex items-center space-x-4">
                             <div className="flex-1 relative">
-                                <Textarea
-                                    ref={textareaRef}
+                                <OrbInput
                                     value={value}
-                                    onChange={(e) => {
-                                        setValue(e.target.value);
-                                        adjustHeight();
-                                    }}
+                                    onChange={(e) => setValue(e.target.value)}
                                     onKeyDown={handleKeyDown}
                                     onFocus={() => setInputFocused(true)}
                                     onBlur={() => setInputFocused(false)}
-                                    placeholder="Ask Eunoia anything..."
-                                    className="min-h-[60px] max-h-[200px] resize-none pr-12 bg-black/40 border-purple-500/30 text-white placeholder-white/50 focus:border-purple-500/50 focus:ring-0 backdrop-blur-sm"
-                                    containerClassName="relative"
-                                    showRing={true}
+                                    className="w-full"
                                 />
                                 
                                 <motion.button
                                     type="button"
                                     onClick={() => setShowCommandPalette(!showCommandPalette)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 transition-colors"
+                                    className="absolute right-20 top-1/2 -translate-y-1/2 p-1 transition-colors z-10"
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
                                     data-command-button
@@ -1688,7 +1673,7 @@ ${new Date(tx.createdAt).toLocaleString()}
                                         setValue(prev => prev + suggestion.prefix + " ");
                                         setShowCommandPalette(false);
                                         setActiveSuggestion(-1);
-                                        textareaRef.current?.focus();
+                                        // Focus handled by OrbInput
                                     }}
                                     whileHover={{ scale: 1.02 }}
                                     whileTap={{ scale: 0.98 }}
