@@ -221,6 +221,105 @@ Cancel a limit order.
 
 ---
 
+### Kalshi Prediction Markets
+
+#### `GET /api/kalshi?action=search&query={query}`
+
+Search for Kalshi prediction markets.
+
+**Query Parameters:**
+- `action` (required) - Must be "search"
+- `query` (required) - Search term for markets
+
+**Response:**
+```json
+{
+  "success": true,
+  "markets": [
+    {
+      "ticker": "string",
+      "title": "string",
+      "yes_bid": 50,
+      "yes_ask": 52,
+      "no_bid": 48,
+      "no_ask": 50,
+      "status": "open"
+    }
+  ]
+}
+```
+
+#### `GET /api/kalshi?action=market&ticker={ticker}`
+
+Get details for a specific market.
+
+**Query Parameters:**
+- `action` (required) - Must be "market"
+- `ticker` (required) - Market ticker symbol
+
+**Response:**
+```json
+{
+  "success": true,
+  "market": {
+    "ticker": "string",
+    "title": "string",
+    "yes_bid": 50,
+    "yes_ask": 52,
+    "status": "open"
+  }
+}
+```
+
+#### `GET /api/kalshi?action=positions`
+
+Get user's active positions on Kalshi.
+
+**Response:**
+```json
+{
+  "success": true,
+  "positions": [
+    {
+      "ticker": "string",
+      "position": 100,
+      "entry_price": 50,
+      "current_price": 55,
+      "unrealized_pnl": 5.0
+    }
+  ]
+}
+```
+
+#### `POST /api/kalshi`
+
+Place an order on Kalshi.
+
+**Request Body:**
+```json
+{
+  "action": "order",
+  "ticker": "market_ticker",
+  "side": "yes",
+  "orderAction": "buy",
+  "count": 100,
+  "type": "market"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "order": {
+    "order_id": "string",
+    "status": "pending"
+  }
+}
+```
+
+---
+
 ### Transactions
 
 #### `GET /api/transactions/history`
