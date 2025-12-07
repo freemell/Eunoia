@@ -63,9 +63,20 @@ export async function GET(req: Request) {
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.error('Kalshi API error:', errorMessage);
+    console.error('❌ Kalshi API error:', errorMessage);
+    
+    // Provide more helpful error messages
+    let userMessage = errorMessage;
+    if (errorMessage.includes('fetch failed') || errorMessage.includes('ECONNREFUSED')) {
+      userMessage = 'Unable to connect to Kalshi API. Please check your internet connection and try again.';
+    } else if (errorMessage.includes('401') || errorMessage.includes('Unauthorized')) {
+      userMessage = 'Kalshi API authentication failed. Please check your API key configuration.';
+    } else if (errorMessage.includes('timeout') || errorMessage.includes('AbortError')) {
+      userMessage = 'Request to Kalshi API timed out. Please try again.';
+    }
+    
     return NextResponse.json(
-      { error: errorMessage, success: false },
+      { error: userMessage, success: false, details: errorMessage },
       { status: 500 }
     );
   }
@@ -120,9 +131,20 @@ export async function POST(req: Request) {
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.error('Kalshi API error:', errorMessage);
+    console.error('❌ Kalshi API error:', errorMessage);
+    
+    // Provide more helpful error messages
+    let userMessage = errorMessage;
+    if (errorMessage.includes('fetch failed') || errorMessage.includes('ECONNREFUSED')) {
+      userMessage = 'Unable to connect to Kalshi API. Please check your internet connection and try again.';
+    } else if (errorMessage.includes('401') || errorMessage.includes('Unauthorized')) {
+      userMessage = 'Kalshi API authentication failed. Please check your API key configuration.';
+    } else if (errorMessage.includes('timeout') || errorMessage.includes('AbortError')) {
+      userMessage = 'Request to Kalshi API timed out. Please try again.';
+    }
+    
     return NextResponse.json(
-      { error: errorMessage, success: false },
+      { error: userMessage, success: false, details: errorMessage },
       { status: 500 }
     );
   }

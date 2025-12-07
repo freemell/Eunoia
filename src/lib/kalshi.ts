@@ -3,8 +3,14 @@
  * Handles interactions with Kalshi prediction markets
  */
 
-const KALSHI_API_BASE = 'https://trading-api.kalshi.com/trade-api/v2';
+// Kalshi API endpoints
+// Production: https://trading-api.kalshi.com/v1
+// Sandbox/Demo: https://demo.kalshi.com/trade-api/v2
+// Public API (for market data): https://api.calendar.kalshi.com/trade-api/v2
+const KALSHI_API_BASE = process.env.KALSHI_API_BASE || 'https://trading-api.kalshi.com/v1';
+// Try public API first for market searches, fallback to trading API
 const KALSHI_PUBLIC_API = 'https://api.calendar.kalshi.com/trade-api/v2';
+const KALSHI_TRADING_API = 'https://trading-api.kalshi.com/v1';
 
 interface KalshiMarket {
   ticker: string;
@@ -75,30 +81,71 @@ function getKalshiHeaders(): HeadersInit {
 }
 
 /**
+ * Create an AbortController with timeout
+ */
+function createTimeoutSignal(timeoutMs: number): AbortSignal {
+  const controller = new AbortController();
+  setTimeout(() => controller.abort(), timeoutMs);
+  return controller.signal;
+}
+
+/**
  * Search for markets by query
+ * Tries public API first, then falls back to trading API if needed
  */
 export async function searchMarkets(query: string): Promise<KalshiMarket[]> {
-  try {
-    const response = await fetch(
-      `${KALSHI_PUBLIC_API}/markets?limit=20&keyword=${encodeURIComponent(query)}`,
-      {
+  const endpoints = [
+    `${KALSHI_PUBLIC_API}/markets`,
+    `${KALSHI_TRADING_API}/markets`,
+  ];
+  
+  for (const baseUrl of endpoints) {
+    try {
+      const url = `${baseUrl}?limit=20&keyword=${encodeURIComponent(query)}`;
+      console.log('🔍 Searching Kalshi markets:', url);
+      
+      const response = await fetch(url, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
+        signal: createTimeoutSignal(10000), // 10 second timeout
+      });
+
+      if (!response.ok) {
+        // If 404 or auth error, try next endpoint
+        if (response.status === 404 || response.status === 401) {
+          console.log(`⚠️ Endpoint ${baseUrl} returned ${response.status}, trying next...`);
+          continue;
+        }
+        const errorText = await response.text().catch(() => response.statusText);
+        console.error('❌ Kalshi API error:', response.status, errorText);
+        throw new Error(`Kalshi API error (${response.status}): ${errorText}`);
       }
-    );
 
-    if (!response.ok) {
-      throw new Error(`Kalshi API error: ${response.statusText}`);
+      const data = await response.json();
+      const markets = data.markets || data || [];
+      console.log('✅ Kalshi markets found:', markets.length);
+      return Array.isArray(markets) ? markets : [];
+    } catch (error) {
+      // If it's a network error and we have more endpoints to try, continue
+      if (error instanceof Error && error.name === 'AbortError' && baseUrl !== endpoints[endpoints.length - 1]) {
+        console.log('⚠️ Request timeout, trying next endpoint...');
+        continue;
+      }
+      // If this is the last endpoint or a different error, throw
+      if (baseUrl === endpoints[endpoints.length - 1]) {
+        console.error('❌ Error searching Kalshi markets:', error);
+        if (error instanceof Error) {
+          throw new Error(`Failed to search Kalshi markets: ${error.message}`);
+        }
+        throw error;
+      }
     }
-
-    const data = await response.json();
-    return data.markets || [];
-  } catch (error) {
-    console.error('Error searching Kalshi markets:', error);
-    throw error;
   }
+  
+  // Should not reach here, but just in case
+  throw new Error('Failed to search Kalshi markets: All endpoints failed');
 }
 
 /**
@@ -106,27 +153,32 @@ export async function searchMarkets(query: string): Promise<KalshiMarket[]> {
  */
 export async function getMarket(ticker: string): Promise<KalshiMarket | null> {
   try {
-    const response = await fetch(
-      `${KALSHI_PUBLIC_API}/markets/${ticker}`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    const url = `${KALSHI_PUBLIC_API}/markets/${ticker}`;
+    console.log('🔍 Getting Kalshi market:', url);
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      signal: createTimeoutSignal(10000),
+    });
 
     if (!response.ok) {
       if (response.status === 404) {
         return null;
       }
-      throw new Error(`Kalshi API error: ${response.statusText}`);
+      const errorText = await response.text().catch(() => response.statusText);
+      throw new Error(`Kalshi API error (${response.status}): ${errorText}`);
     }
 
     const data = await response.json();
-    return data.market || null;
+    return data.market || data || null;
   } catch (error) {
-    console.error('Error getting Kalshi market:', error);
+    console.error('❌ Error getting Kalshi market:', error);
+    if (error instanceof Error) {
+      throw new Error(`Failed to get Kalshi market: ${error.message}`);
+    }
     throw error;
   }
 }
@@ -137,19 +189,28 @@ export async function getMarket(ticker: string): Promise<KalshiMarket | null> {
 export async function getPositions(): Promise<KalshiPosition[]> {
   try {
     const headers = getKalshiHeaders();
-    const response = await fetch(`${KALSHI_API_BASE}/portfolio/positions`, {
+    const url = `${KALSHI_API_BASE}/portfolio/positions`;
+    console.log('🔍 Getting Kalshi positions:', url);
+    
+    const response = await fetch(url, {
       method: 'GET',
       headers,
+      signal: createTimeoutSignal(10000),
     });
 
     if (!response.ok) {
-      throw new Error(`Kalshi API error: ${response.statusText}`);
+      const errorText = await response.text().catch(() => response.statusText);
+      console.error('❌ Kalshi API error:', response.status, errorText);
+      throw new Error(`Kalshi API error (${response.status}): ${errorText}`);
     }
 
     const data = await response.json();
     return data.positions || [];
   } catch (error) {
-    console.error('Error getting Kalshi positions:', error);
+    console.error('❌ Error getting Kalshi positions:', error);
+    if (error instanceof Error) {
+      throw new Error(`Failed to get Kalshi positions: ${error.message}`);
+    }
     throw error;
   }
 }
@@ -185,16 +246,27 @@ export async function placeOrder(order: {
       }
     }
 
-    const response = await fetch(`${KALSHI_API_BASE}/orders`, {
+    const url = `${KALSHI_API_BASE}/orders`;
+    console.log('📝 Placing Kalshi order:', url, orderPayload);
+    
+    const response = await fetch(url, {
       method: 'POST',
       headers,
       body: JSON.stringify(orderPayload),
+      signal: createTimeoutSignal(15000), // 15 second timeout for orders
     });
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
+      const errorText = await response.text().catch(() => response.statusText);
+      let errorData;
+      try {
+        errorData = JSON.parse(errorText);
+      } catch {
+        errorData = { message: errorText };
+      }
+      console.error('❌ Kalshi order error:', response.status, errorData);
       throw new Error(
-        errorData.message || `Kalshi API error: ${response.statusText}`
+        errorData.message || errorData.error || `Kalshi API error (${response.status}): ${errorText}`
       );
     }
 
@@ -215,13 +287,18 @@ export async function placeOrder(order: {
 export async function cancelOrder(orderId: string): Promise<void> {
   try {
     const headers = getKalshiHeaders();
-    const response = await fetch(`${KALSHI_API_BASE}/orders/${orderId}`, {
+    const url = `${KALSHI_API_BASE}/orders/${orderId}`;
+    console.log('🗑️ Canceling Kalshi order:', url);
+    
+    const response = await fetch(url, {
       method: 'DELETE',
       headers,
+      signal: createTimeoutSignal(10000),
     });
 
     if (!response.ok) {
-      throw new Error(`Kalshi API error: ${response.statusText}`);
+      const errorText = await response.text().catch(() => response.statusText);
+      throw new Error(`Kalshi API error (${response.status}): ${errorText}`);
     }
   } catch (error) {
     console.error('Error canceling Kalshi order:', error);
@@ -235,13 +312,18 @@ export async function cancelOrder(orderId: string): Promise<void> {
 export async function getBalance(): Promise<{ balance: number; currency: string }> {
   try {
     const headers = getKalshiHeaders();
-    const response = await fetch(`${KALSHI_API_BASE}/portfolio/balance`, {
+    const url = `${KALSHI_API_BASE}/portfolio/balance`;
+    console.log('💰 Getting Kalshi balance:', url);
+    
+    const response = await fetch(url, {
       method: 'GET',
       headers,
+      signal: createTimeoutSignal(10000),
     });
 
     if (!response.ok) {
-      throw new Error(`Kalshi API error: ${response.statusText}`);
+      const errorText = await response.text().catch(() => response.statusText);
+      throw new Error(`Kalshi API error (${response.status}): ${errorText}`);
     }
 
     const data = await response.json();
