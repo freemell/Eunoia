@@ -995,7 +995,7 @@ export function AnimatedAIChat() {
                                      action: 'order',
                                      ticker: market.ticker,
                                      side: side === 'yes' ? 'yes' : 'no',
-                                     action: 'buy',
+                                     orderAction: 'buy',
                                      count: betAmount,
                                      type: 'market',
                                  }),

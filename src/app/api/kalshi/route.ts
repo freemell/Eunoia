@@ -78,11 +78,11 @@ export async function POST(req: Request) {
 
     switch (action) {
       case 'order': {
-        const { ticker, side, action: orderAction, count, type, yes_price, no_price } = params;
+        const { ticker, side, orderAction, count, type, yes_price, no_price } = params;
         
         if (!ticker || !side || !orderAction || !count || !type) {
           return NextResponse.json(
-            { error: 'Missing required parameters: ticker, side, action, count, type' },
+            { error: 'Missing required parameters: ticker, side, orderAction, count, type' },
             { status: 400 }
           );
         }
