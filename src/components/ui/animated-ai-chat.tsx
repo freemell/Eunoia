@@ -880,8 +880,19 @@ export function AnimatedAIChat() {
                 const data = await response.json();
                 
                 if (data.success) {
-                    // Add AI response to chat
-                    setMessages(prev => [...prev, { role: 'assistant', content: data.response }]);
+                    // Add AI response to chat (but skip if it's just JSON for kalshi_query - we'll show formatted results instead)
+                    if (data.action !== 'kalshi_query' || !data.params) {
+                        // Clean up response - remove raw JSON if present
+                        let cleanResponse = data.response || '';
+                        // Remove JSON objects from response if they exist
+                        cleanResponse = cleanResponse.replace(/\{[\s\S]*?"action":\s*"kalshi_query"[\s\S]*?\}/g, '');
+                        cleanResponse = cleanResponse.replace(/\(Please wait for the response\)/gi, '');
+                        cleanResponse = cleanResponse.trim();
+                        
+                        if (cleanResponse && cleanResponse.length > 0) {
+                            setMessages(prev => [...prev, { role: 'assistant', content: cleanResponse }]);
+                        }
+                    }
                     
                     // Handle specific actions
                     if (data.action === 'connect' && !connected) {
@@ -943,31 +954,75 @@ export function AnimatedAIChat() {
                              const kalshiData = await kalshiResponse.json();
                              
                              if (kalshiData.success && kalshiData.markets && kalshiData.markets.length > 0) {
-                                 const marketsHtml = kalshiData.markets.slice(0, 5).map((market: any) => {
-                                     const yesPrice = market.yes_bid || 0;
-                                     const noPrice = market.no_bid || 0;
-                                     return `<div style="margin: 8px 0; padding: 12px; background: rgba(0, 255, 65, 0.1); border-radius: 6px; border: 1px solid rgba(0, 255, 65, 0.3);">
-                                         <div style="font-weight: 600; color: #00ff41; margin-bottom: 4px;">${market.title}</div>
-                                         <div style="font-size: 12px; color: #9ca3af;">Ticker: ${market.ticker}</div>
-                                         <div style="font-size: 12px; color: #e5e7eb; margin-top: 4px;">Yes: ${(yesPrice / 100).toFixed(1)}% | No: ${(noPrice / 100).toFixed(1)}%</div>
-                                     </div>`;
-                                 }).join('');
+                                 const markets = kalshiData.markets.slice(0, 10);
+                                 const marketsHtml = `
+<div style="margin: 16px 0; padding: 0;">
+    <div style="margin-bottom: 16px; padding: 12px; background: rgba(0, 255, 65, 0.1); border-radius: 8px; border-left: 3px solid #00ff41;">
+        <div style="font-size: 16px; font-weight: 600; color: #00ff41; margin-bottom: 4px;">📊 Found ${markets.length} Market${markets.length > 1 ? 's' : ''}</div>
+        <div style="font-size: 12px; color: #9ca3af;">Search: "${query}"</div>
+    </div>
+    ${markets.map((market: any, index: number) => {
+        const yesPrice = market.yes_bid || market.yes_ask || 0;
+        const noPrice = market.no_bid || market.no_ask || 0;
+        const yesPercent = (yesPrice / 100).toFixed(1);
+        const noPercent = (noPrice / 100).toFixed(1);
+        const statusColor = market.status === 'open' ? '#00ff41' : market.status === 'closed' ? '#ef4444' : '#f59e0b';
+        
+        return `
+    <div style="margin: 12px 0; padding: 16px; background: rgba(0, 0, 0, 0.4); border-radius: 8px; border: 1px solid rgba(0, 255, 65, 0.2); transition: all 0.2s;">
+        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+            <div style="flex: 1;">
+                <div style="font-size: 14px; font-weight: 600; color: #00ff41; margin-bottom: 8px; line-height: 1.4;">
+                    ${market.title || 'Market'}
+                </div>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px;">
+                    <div style="font-size: 11px; color: #9ca3af;">
+                        <span style="color: #6b7280;">Ticker:</span> 
+                        <span style="color: #00ff41; font-family: monospace;">${market.ticker || 'N/A'}</span>
+                    </div>
+                    <div style="font-size: 11px; color: #9ca3af;">
+                        <span style="color: #6b7280;">Status:</span> 
+                        <span style="color: ${statusColor}; text-transform: capitalize;">${market.status || 'unknown'}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(0, 255, 65, 0.1);">
+            <div style="padding: 10px; background: rgba(0, 255, 65, 0.1); border-radius: 6px; border: 1px solid rgba(0, 255, 65, 0.2);">
+                <div style="font-size: 11px; color: #9ca3af; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Yes</div>
+                <div style="font-size: 18px; font-weight: 700; color: #00ff41; font-family: monospace;">${yesPercent}%</div>
+                <div style="font-size: 10px; color: #6b7280; margin-top: 2px;">Bid: ${yesPrice > 0 ? (yesPrice / 100).toFixed(1) + '%' : 'N/A'}</div>
+            </div>
+            <div style="padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border: 1px solid rgba(239, 68, 68, 0.2);">
+                <div style="font-size: 11px; color: #9ca3af; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">No</div>
+                <div style="font-size: 18px; font-weight: 700; color: #ef4444; font-family: monospace;">${noPercent}%</div>
+                <div style="font-size: 10px; color: #6b7280; margin-top: 2px;">Bid: ${noPrice > 0 ? (noPrice / 100).toFixed(1) + '%' : 'N/A'}</div>
+            </div>
+        </div>
+    </div>`;
+    }).join('')}
+    <div style="margin-top: 16px; padding: 12px; background: rgba(0, 255, 65, 0.05); border-radius: 6px; border: 1px dashed rgba(0, 255, 65, 0.3); text-align: center;">
+        <div style="font-size: 12px; color: #9ca3af;">
+            💡 Tip: Say "Bet [amount] SOL yes/no on [market]" to place a bet
+        </div>
+    </div>
+</div>`;
                                  
                                  setMessages(prev => [...prev, {
                                      role: 'assistant',
-                                     content: `📊 **Kalshi Markets Found:**\n\n${marketsHtml}`
+                                     content: marketsHtml
                                  }]);
                              } else {
                                  setMessages(prev => [...prev, {
                                      role: 'assistant',
-                                     content: `📊 No markets found for "${query}". Try a different search term.`
+                                     content: `📊 **No Markets Found**\n\nNo markets found for "${query}". Try searching with different keywords or check back later.`
                                  }]);
                              }
                          } catch (error) {
                              console.error('Kalshi query error:', error);
                              setMessages(prev => [...prev, {
                                  role: 'assistant',
-                                 content: '❌ Failed to search Kalshi markets. Please try again.'
+                                 content: '❌ **Error Searching Markets**\n\nFailed to search Kalshi markets. Please check your connection and try again.'
                              }]);
                          }
                      } else if (data.action === 'kalshi_bet' && data.params) {
