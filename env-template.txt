@@ -15,6 +15,12 @@ ENCRYPTION_SECRET=your_encryption_secret_here_min_32_characters
 OPENAI_API_KEY=your_openai_api_key_here
 GROQ_API_KEY=your_groq_api_key_here
 
+# Kalshi Prediction Markets
+# Note: Kalshi uses API Key ID (UUID format) and optionally an API secret
+# For full production, you may need RSA private key for request signing
+KALSHI_API_KEY=your_kalshi_api_key_id_here
+KALSHI_API_SECRET=your_kalshi_api_secret_here
+
 # Solana Configuration
 SOLANA_RPC_URL=https://api.mainnet-beta.solana.com
 NEXT_PUBLIC_SOLANA_RPC_URL=https://api.mainnet-beta.solana.com

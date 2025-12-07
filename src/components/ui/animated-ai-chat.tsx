@@ -936,6 +936,122 @@ export function AnimatedAIChat() {
                                  content: '❌ Failed to create limit order. Please try again.'
                              }]);
                          }
+                     } else if (data.action === 'kalshi_query' && data.params) {
+                         try {
+                             const query = data.params.query || data.params.event || '';
+                             const kalshiResponse = await fetch(`/api/kalshi?action=search&query=${encodeURIComponent(query)}`);
+                             const kalshiData = await kalshiResponse.json();
+                             
+                             if (kalshiData.success && kalshiData.markets && kalshiData.markets.length > 0) {
+                                 const marketsHtml = kalshiData.markets.slice(0, 5).map((market: any) => {
+                                     const yesPrice = market.yes_bid || 0;
+                                     const noPrice = market.no_bid || 0;
+                                     return `<div style="margin: 8px 0; padding: 12px; background: rgba(0, 255, 65, 0.1); border-radius: 6px; border: 1px solid rgba(0, 255, 65, 0.3);">
+                                         <div style="font-weight: 600; color: #00ff41; margin-bottom: 4px;">${market.title}</div>
+                                         <div style="font-size: 12px; color: #9ca3af;">Ticker: ${market.ticker}</div>
+                                         <div style="font-size: 12px; color: #e5e7eb; margin-top: 4px;">Yes: ${(yesPrice / 100).toFixed(1)}% | No: ${(noPrice / 100).toFixed(1)}%</div>
+                                     </div>`;
+                                 }).join('');
+                                 
+                                 setMessages(prev => [...prev, {
+                                     role: 'assistant',
+                                     content: `📊 **Kalshi Markets Found:**\n\n${marketsHtml}`
+                                 }]);
+                             } else {
+                                 setMessages(prev => [...prev, {
+                                     role: 'assistant',
+                                     content: `📊 No markets found for "${query}". Try a different search term.`
+                                 }]);
+                             }
+                         } catch (error) {
+                             console.error('Kalshi query error:', error);
+                             setMessages(prev => [...prev, {
+                                 role: 'assistant',
+                                 content: '❌ Failed to search Kalshi markets. Please try again.'
+                             }]);
+                         }
+                     } else if (data.action === 'kalshi_bet' && data.params) {
+                         try {
+                             const { event, side, amount, amount_token } = data.params;
+                             // First search for the market
+                             const searchResponse = await fetch(`/api/kalshi?action=search&query=${encodeURIComponent(event)}`);
+                             const searchData = await searchResponse.json();
+                             
+                             if (!searchData.success || !searchData.markets || searchData.markets.length === 0) {
+                                 setMessages(prev => [...prev, {
+                                     role: 'assistant',
+                                     content: `❌ Could not find market for "${event}". Please try a more specific search.`
+                                 }]);
+                                 return;
+                             }
+                             
+                             const market = searchData.markets[0];
+                             const betAmount = amount_token === 'SOL' ? Math.floor(amount * 100) : Math.floor(amount); // Convert SOL to cents if needed
+                             
+                             const orderResponse = await fetch('/api/kalshi', {
+                                 method: 'POST',
+                                 headers: { 'Content-Type': 'application/json' },
+                                 body: JSON.stringify({
+                                     action: 'order',
+                                     ticker: market.ticker,
+                                     side: side === 'yes' ? 'yes' : 'no',
+                                     action: 'buy',
+                                     count: betAmount,
+                                     type: 'market',
+                                 }),
+                             });
+                             
+                             const orderData = await orderResponse.json();
+                             
+                             if (orderData.success) {
+                                 setMessages(prev => [...prev, {
+                                     role: 'assistant',
+                                     content: `✅ Bet placed successfully! ${side.toUpperCase()} on "${market.title}" for ${amount} ${amount_token || 'USD'}. Order ID: ${orderData.order.order_id}`
+                                 }]);
+                             } else {
+                                 setMessages(prev => [...prev, {
+                                     role: 'assistant',
+                                     content: `❌ Failed to place bet: ${orderData.error}`
+                                 }]);
+                             }
+                         } catch (error) {
+                             console.error('Kalshi bet error:', error);
+                             setMessages(prev => [...prev, {
+                                 role: 'assistant',
+                                 content: '❌ Failed to place bet. Please try again.'
+                             }]);
+                         }
+                     } else if (data.action === 'kalshi_positions') {
+                         try {
+                             const positionsResponse = await fetch('/api/kalshi?action=positions');
+                             const positionsData = await positionsResponse.json();
+                             
+                             if (positionsData.success && positionsData.positions && positionsData.positions.length > 0) {
+                                 const positionsHtml = positionsData.positions.map((pos: any) => {
+                                     return `<div style="margin: 8px 0; padding: 12px; background: rgba(0, 255, 65, 0.1); border-radius: 6px; border: 1px solid rgba(0, 255, 65, 0.3);">
+                                         <div style="font-weight: 600; color: #00ff41;">${pos.ticker}</div>
+                                         <div style="font-size: 12px; color: #e5e7eb; margin-top: 4px;">Position: ${pos.position} | Entry: ${(pos.entry_price / 100).toFixed(1)}% | Current: ${(pos.current_price / 100).toFixed(1)}%</div>
+                                         <div style="font-size: 12px; color: ${pos.unrealized_pnl >= 0 ? '#10b981' : '#ef4444'}; margin-top: 4px;">P&L: ${pos.unrealized_pnl >= 0 ? '+' : ''}${pos.unrealized_pnl.toFixed(2)}</div>
+                                     </div>`;
+                                 }).join('');
+                                 
+                                 setMessages(prev => [...prev, {
+                                     role: 'assistant',
+                                     content: `📊 **Your Kalshi Positions:**\n\n${positionsHtml}`
+                                 }]);
+                             } else {
+                                 setMessages(prev => [...prev, {
+                                     role: 'assistant',
+                                     content: '📊 You have no open positions on Kalshi.'
+                                 }]);
+                             }
+                         } catch (error) {
+                             console.error('Kalshi positions error:', error);
+                             setMessages(prev => [...prev, {
+                                 role: 'assistant',
+                                 content: '❌ Failed to fetch positions. Please try again.'
+                             }]);
+                         }
                      } else if (data.action === 'history' && publicKey) {
                          try {
                              const historyResponse = await fetch(`/api/transactions/simple-history?walletAddress=${publicKey.toString()}&limit=20`);
