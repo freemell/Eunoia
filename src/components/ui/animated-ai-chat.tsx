@@ -956,8 +956,23 @@ export function AnimatedAIChat() {
                      } else if (data.action === 'kalshi_query' && data.params) {
                          try {
                              const query = data.params.query || data.params.event || '';
+                             
+                             // Show loading state
+                             setMessages(prev => [...prev, {
+                                 role: 'assistant',
+                                 content: `<div style="padding: 16px; background: rgba(0, 255, 65, 0.1); border-radius: 8px; border: 1px solid rgba(0, 255, 65, 0.3);">
+                                     <div style="display: flex; align-items: center; gap: 12px;">
+                                         <div style="width: 20px; height: 20px; border: 2px solid rgba(0, 255, 65, 0.3); border-top-color: #00ff41; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                                         <div style="color: #00ff41; font-weight: 500;">Searching Kalshi markets...</div>
+                                     </div>
+                                 </div>`
+                             }]);
+                             
                              const kalshiResponse = await fetch(`/api/kalshi?action=search&query=${encodeURIComponent(query)}`);
                              const kalshiData = await kalshiResponse.json();
+                             
+                             // Remove loading message
+                             setMessages(prev => prev.slice(0, -1));
                              
                              if (kalshiData.success && kalshiData.markets && kalshiData.markets.length > 0) {
                                  const markets = kalshiData.markets.slice(0, 10);
