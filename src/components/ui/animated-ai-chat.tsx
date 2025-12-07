@@ -1037,16 +1037,83 @@ export function AnimatedAIChat() {
                                      content: marketsHtml
                                  }]);
                              } else {
+                                 // No markets found - show helpful message
+                                 const noMarketsHtml = `
+<div style="margin: 16px 0; padding: 0;">
+    <div style="padding: 24px; background: linear-gradient(135deg, rgba(0, 255, 65, 0.1) 0%, rgba(0, 255, 65, 0.05) 100%); border-radius: 10px; border: 1px solid rgba(0, 255, 65, 0.3); box-shadow: 0 4px 12px rgba(0, 255, 65, 0.1);">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+            <div style="font-size: 24px;">🔍</div>
+            <div style="font-size: 18px; font-weight: 700; color: #00ff41; text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);">No Markets Found</div>
+        </div>
+        <div style="color: #e5e7eb; margin-bottom: 16px; line-height: 1.6;">
+            <p style="margin-bottom: 12px;">We couldn't find any markets matching <span style="color: #00ff41; font-weight: 500;">"${query}"</span> on Kalshi right now.</p>
+            <p style="margin-bottom: 0;">This could mean:</p>
+        </div>
+        <div style="background: rgba(0, 0, 0, 0.3); border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+            <ul style="margin: 0; padding-left: 20px; color: #9ca3af; line-height: 1.8;">
+                <li>The market hasn't been created yet</li>
+                <li>Try different keywords or search terms</li>
+                <li>The market may have closed or expired</li>
+                <li>Check back later for new markets</li>
+            </ul>
+        </div>
+        <div style="padding: 12px; background: rgba(0, 255, 65, 0.05); border-radius: 6px; border: 1px dashed rgba(0, 255, 65, 0.3);">
+            <div style="font-size: 12px; color: #9ca3af; text-align: center;">
+                💡 <span style="color: #00ff41;">Tip:</span> Try searching for specific topics like "election", "inflation", "bitcoin", or "weather"
+            </div>
+        </div>
+    </div>
+</div>`;
+                                 
                                  setMessages(prev => [...prev, {
                                      role: 'assistant',
-                                     content: `📊 **No Markets Found**\n\nNo markets found for "${query}". Try searching with different keywords or check back later.`
+                                     content: noMarketsHtml
                                  }]);
                              }
                          } catch (error) {
                              console.error('Kalshi query error:', error);
+                             
+                             // Remove loading message if it exists
+                             setMessages(prev => {
+                                 const lastMsg = prev[prev.length - 1];
+                                 if (lastMsg?.content?.includes('Searching Kalshi markets')) {
+                                     return prev.slice(0, -1);
+                                 }
+                                 return prev;
+                             });
+                             
+                             // Show error message with helpful info
+                             const errorHtml = `
+<div style="margin: 16px 0; padding: 0;">
+    <div style="padding: 24px; background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%); border-radius: 10px; border: 1px solid rgba(239, 68, 68, 0.3); box-shadow: 0 4px 12px rgba(239, 68, 68, 0.1);">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+            <div style="font-size: 24px;">⚠️</div>
+            <div style="font-size: 18px; font-weight: 700; color: #ef4444; text-shadow: 0 0 10px rgba(239, 68, 68, 0.5);">Unable to Search Markets</div>
+        </div>
+        <div style="color: #e5e7eb; margin-bottom: 16px; line-height: 1.6;">
+            <p style="margin-bottom: 12px;">We're having trouble connecting to Kalshi right now. This could be a temporary issue.</p>
+        </div>
+        <div style="background: rgba(0, 0, 0, 0.3); border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+            <div style="color: #9ca3af; line-height: 1.8;">
+                <div style="margin-bottom: 8px;"><strong style="color: #ef4444;">What you can do:</strong></div>
+                <ul style="margin: 0; padding-left: 20px; line-height: 1.8;">
+                    <li>Check your internet connection</li>
+                    <li>Try again in a few moments</li>
+                    <li>Visit <a href="https://kalshi.com" target="_blank" style="color: #00ff41; text-decoration: underline;">kalshi.com</a> directly</li>
+                </ul>
+            </div>
+        </div>
+        <div style="padding: 12px; background: rgba(0, 255, 65, 0.05); border-radius: 6px; border: 1px dashed rgba(0, 255, 65, 0.3);">
+            <div style="font-size: 12px; color: #9ca3af; text-align: center;">
+                🔄 The Kalshi API may be temporarily unavailable. Please try again later.
+            </div>
+        </div>
+    </div>
+</div>`;
+                             
                              setMessages(prev => [...prev, {
                                  role: 'assistant',
-                                 content: '❌ **Error Searching Markets**\n\nFailed to search Kalshi markets. Please check your connection and try again.'
+                                 content: errorHtml
                              }]);
                          }
                      } else if (data.action === 'kalshi_bet' && data.params) {
