@@ -1,6 +1,11 @@
 # Eunoia - AI-Powered Solana Assistant
 
-Eunoia is a rebranded, modern AI-powered Solana blockchain assistant with a cyber-matrix aesthetic. Built with Next.js, TypeScript, and Tailwind CSS.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Next.js](https://img.shields.io/badge/Next.js-15-black)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
+[![Solana](https://img.shields.io/badge/Solana-Web3-purple)](https://solana.com/)
+
+Eunoia is a modern AI-powered Solana blockchain assistant with a cyber-matrix aesthetic. Built with Next.js, TypeScript, and Tailwind CSS, Eunoia enables natural language interactions with the Solana blockchain.
 
 ## Features
 
@@ -96,6 +101,36 @@ Eunoia uses a cyber-matrix aesthetic with:
 - **Accent Color**: Neon Magenta (#ff00ff)
 - **Background**: Animated matrix grid
 
+## Documentation
+
+- [API Documentation](./API.md) - Complete API reference
+- [Architecture Guide](./ARCHITECTURE.md) - Technical architecture and design
+- [Contributing Guide](./CONTRIBUTING.md) - How to contribute to Eunoia
+- [Security Policy](./SECURITY.md) - Security reporting and best practices
+- [Changelog](./CHANGELOG.md) - Version history and updates
+
+## Community
+
+- **Issues**: [Report bugs or request features](https://github.com/freemell/Eunoia/issues)
+- **Discussions**: [Join the conversation](https://github.com/freemell/Eunoia/discussions)
+- **Telegram Bot**: [@euoniacomp_bot](https://t.me/euoniacomp_bot)
+
+## Roadmap
+
+- [ ] Multi-chain support (Ethereum, Polygon)
+- [ ] Advanced trading features
+- [ ] Portfolio tracking and analytics
+- [ ] NFT marketplace integration
+- [ ] Mobile app (iOS/Android)
+- [ ] Enhanced AI capabilities with context memory
+
 ## License
 
-MIT
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- [Solana](https://solana.com/) - The blockchain platform
+- [Jupiter](https://jup.ag/) - Token swap aggregator
+- [Groq](https://groq.com/) - AI inference platform
+- [Next.js](https://nextjs.org/) - React framework
