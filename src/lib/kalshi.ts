@@ -3,14 +3,11 @@
  * Handles interactions with Kalshi prediction markets
  */
 
-// Kalshi API endpoints
-// Production: https://trading-api.kalshi.com/v1
-// Sandbox/Demo: https://demo.kalshi.com/trade-api/v2
-// Public API (for market data): https://api.calendar.kalshi.com/trade-api/v2
-const KALSHI_API_BASE = process.env.KALSHI_API_BASE || 'https://trading-api.kalshi.com/v1';
-// Try public API first for market searches, fallback to trading API
-const KALSHI_PUBLIC_API = 'https://api.calendar.kalshi.com/trade-api/v2';
-const KALSHI_TRADING_API = 'https://trading-api.kalshi.com/v1';
+import { createSign } from 'crypto';
+import { randomUUID } from 'crypto';
+
+// Kalshi API endpoints - Unified under trade-api/v2
+const KALSHI_API_BASE = 'https://trading-api.kalshi.com/trade-api/v2';
 
 interface KalshiMarket {
   ticker: string;
@@ -44,37 +41,45 @@ interface KalshiPosition {
 }
 
 /**
- * Get Kalshi API headers with authentication
- * Note: Kalshi typically uses API Key ID + RSA private key for signing requests
- * For now, we'll use a simpler approach with the provided API key
- * Full RSA signing can be implemented later if needed
+ * Generate signed headers for Kalshi API requests
+ * Kalshi requires RSA-SHA256 signing for authenticated endpoints
  */
-function getKalshiHeaders(): HeadersInit {
+function getKalshiSignedHeaders(
+  method: string,
+  path: string,
+  payload: string = ''
+): HeadersInit {
   const apiKey = process.env.KALSHI_API_KEY;
-  const apiSecret = process.env.KALSHI_API_SECRET;
+  const privateKey = process.env.KALSHI_PRIVATE_KEY;
   
   if (!apiKey) {
     throw new Error('KALSHI_API_KEY not configured');
   }
 
-  // Kalshi API authentication
-  // Option 1: If both key and secret are provided, use basic auth
-  // Option 2: Use API key as X-API-Key header (common pattern)
-  // Option 3: For full production, implement RSA signing with private key
-  
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
   };
 
-  if (apiSecret) {
-    // Basic auth with key:secret
-    const credentials = Buffer.from(`${apiKey}:${apiSecret}`).toString('base64');
-    headers['Authorization'] = `Basic ${credentials}`;
-  } else {
-    // Try API key header approach
-    headers['X-API-Key'] = apiKey;
-    // Also try as bearer token (some endpoints may accept this)
-    headers['Authorization'] = `Bearer ${apiKey}`;
+  // For public endpoints (GET /markets, /events), no signing needed
+  // For authenticated endpoints, use RSA signing
+  if (privateKey && (method === 'POST' || method === 'DELETE' || path.includes('/portfolio'))) {
+    const timestamp = Date.now().toString();
+    const nonce = randomUUID();
+    
+    // Create message to sign: method + path + timestamp + nonce + payload
+    const message = `${method}\n${path}\n${timestamp}\n${nonce}\n${payload}`;
+    
+    // Sign with RSA-SHA256
+    const signer = createSign('RSA-SHA256');
+    signer.update(message);
+    
+    // Handle multiline private key (replace \n with actual newlines)
+    const formattedKey = privateKey.replace(/\\n/g, '\n');
+    const signature = signer.sign(formattedKey, 'base64');
+    
+    headers['X-Kalshi-Timestamp'] = timestamp;
+    headers['X-Kalshi-Nonce'] = nonce;
+    headers['X-Kalshi-Signature'] = signature;
   }
 
   return headers;
@@ -91,69 +96,48 @@ function createTimeoutSignal(timeoutMs: number): AbortSignal {
 
 /**
  * Search for markets by query
- * Tries public API first, then falls back to trading API if needed
+ * Public endpoint - no authentication required
  */
 export async function searchMarkets(query: string): Promise<KalshiMarket[]> {
-  const endpoints = [
-    `${KALSHI_PUBLIC_API}/markets`,
-    `${KALSHI_TRADING_API}/markets`,
-  ];
-  
-  for (const baseUrl of endpoints) {
-    try {
-      const url = `${baseUrl}?limit=20&keyword=${encodeURIComponent(query)}`;
-      console.log('🔍 Searching Kalshi markets:', url);
-      
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        signal: createTimeoutSignal(10000), // 10 second timeout
-      });
+  try {
+    const path = '/trade-api/v2/markets';
+    const url = `${KALSHI_API_BASE}?limit=20&keyword=${encodeURIComponent(query)}&status=open`;
+    console.log('🔍 Searching Kalshi markets:', url);
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      signal: createTimeoutSignal(10000), // 10 second timeout
+    });
 
-      if (!response.ok) {
-        // If 404 or auth error, try next endpoint
-        if (response.status === 404 || response.status === 401) {
-          console.log(`⚠️ Endpoint ${baseUrl} returned ${response.status}, trying next...`);
-          continue;
-        }
-        const errorText = await response.text().catch(() => response.statusText);
-        console.error('❌ Kalshi API error:', response.status, errorText);
-        throw new Error(`Kalshi API error (${response.status}): ${errorText}`);
-      }
-
-      const data = await response.json();
-      const markets = data.markets || data || [];
-      console.log('✅ Kalshi markets found:', markets.length);
-      return Array.isArray(markets) ? markets : [];
-    } catch (error) {
-      // If it's a network error and we have more endpoints to try, continue
-      if (error instanceof Error && error.name === 'AbortError' && baseUrl !== endpoints[endpoints.length - 1]) {
-        console.log('⚠️ Request timeout, trying next endpoint...');
-        continue;
-      }
-      // If this is the last endpoint or a different error, throw
-      if (baseUrl === endpoints[endpoints.length - 1]) {
-        console.error('❌ Error searching Kalshi markets:', error);
-        if (error instanceof Error) {
-          throw new Error(`Failed to search Kalshi markets: ${error.message}`);
-        }
-        throw error;
-      }
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => response.statusText);
+      console.error('❌ Kalshi API error:', response.status, errorText);
+      throw new Error(`Kalshi API error (${response.status}): ${errorText}`);
     }
+
+    const data = await response.json();
+    const markets = data.markets || data || [];
+    console.log('✅ Kalshi markets found:', Array.isArray(markets) ? markets.length : 0);
+    return Array.isArray(markets) ? markets : [];
+  } catch (error) {
+    console.error('❌ Error searching Kalshi markets:', error);
+    if (error instanceof Error) {
+      throw new Error(`Failed to search Kalshi markets: ${error.message}`);
+    }
+    throw error;
   }
-  
-  // Should not reach here, but just in case
-  throw new Error('Failed to search Kalshi markets: All endpoints failed');
 }
 
 /**
  * Get market details by ticker
+ * Public endpoint - no authentication required
  */
 export async function getMarket(ticker: string): Promise<KalshiMarket | null> {
   try {
-    const url = `${KALSHI_PUBLIC_API}/markets/${ticker}`;
+    const url = `${KALSHI_API_BASE}/markets/${ticker}`;
     console.log('🔍 Getting Kalshi market:', url);
     
     const response = await fetch(url, {
@@ -185,10 +169,12 @@ export async function getMarket(ticker: string): Promise<KalshiMarket | null> {
 
 /**
  * Get user's positions
+ * Requires authentication with RSA signing
  */
 export async function getPositions(): Promise<KalshiPosition[]> {
   try {
-    const headers = getKalshiHeaders();
+    const path = '/trade-api/v2/portfolio/positions';
+    const headers = getKalshiSignedHeaders('GET', path);
     const url = `${KALSHI_API_BASE}/portfolio/positions`;
     console.log('🔍 Getting Kalshi positions:', url);
     
@@ -228,8 +214,6 @@ export async function placeOrder(order: {
   no_price?: number;
 }): Promise<{ order_id: string; status: string }> {
   try {
-    const headers = getKalshiHeaders();
-    
     const orderPayload: any = {
       ticker: order.ticker,
       side: order.side,
@@ -246,13 +230,16 @@ export async function placeOrder(order: {
       }
     }
 
+    const path = '/trade-api/v2/orders';
+    const payload = JSON.stringify(orderPayload);
+    const headers = getKalshiSignedHeaders('POST', path, payload);
     const url = `${KALSHI_API_BASE}/orders`;
     console.log('📝 Placing Kalshi order:', url, orderPayload);
     
     const response = await fetch(url, {
       method: 'POST',
       headers,
-      body: JSON.stringify(orderPayload),
+      body: payload,
       signal: createTimeoutSignal(15000), // 15 second timeout for orders
     });
 
@@ -286,7 +273,8 @@ export async function placeOrder(order: {
  */
 export async function cancelOrder(orderId: string): Promise<void> {
   try {
-    const headers = getKalshiHeaders();
+    const path = `/trade-api/v2/orders/${orderId}`;
+    const headers = getKalshiSignedHeaders('DELETE', path);
     const url = `${KALSHI_API_BASE}/orders/${orderId}`;
     console.log('🗑️ Canceling Kalshi order:', url);
     
@@ -311,7 +299,8 @@ export async function cancelOrder(orderId: string): Promise<void> {
  */
 export async function getBalance(): Promise<{ balance: number; currency: string }> {
   try {
-    const headers = getKalshiHeaders();
+    const path = '/trade-api/v2/portfolio/balance';
+    const headers = getKalshiSignedHeaders('GET', path);
     const url = `${KALSHI_API_BASE}/portfolio/balance`;
     console.log('💰 Getting Kalshi balance:', url);
     
