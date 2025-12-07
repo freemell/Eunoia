@@ -1,6 +1,6 @@
 # Eunoia API Documentation
 
-This document describes the API endpoints available in Eunoia.
+This document describes the API endpoints available in Eunoia, including Solana blockchain operations and Kalshi prediction market integration.
 
 ## Base URL
 

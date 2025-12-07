@@ -36,7 +36,7 @@ export default function DocsPage() {
                 Eunoia Documentation
               </h1>
               <p className="text-gray-400 text-lg">
-                Complete guide to using Eunoia for Solana blockchain operations
+                Complete guide to using Eunoia for Solana blockchain operations and Kalshi prediction markets
               </p>
             </div>
           </div>
@@ -55,11 +55,12 @@ export default function DocsPage() {
           </h2>
           <ul className="space-y-2 text-gray-300">
             <li><a href="#limit-orders" className="hover:text-purple-400 transition-colors flex items-center space-x-2"><Zap className="w-4 h-4" /><span>1. Limit Orders</span></a></li>
-            <li><a href="#natural-language" className="hover:text-purple-400 transition-colors flex items-center space-x-2"><Code className="w-4 h-4" /><span>2. Natural Language Commands</span></a></li>
-            <li><a href="#features" className="hover:text-purple-400 transition-colors flex items-center space-x-2"><TrendingUp className="w-4 h-4" /><span>3. Features</span></a></li>
-            <li><a href="#notifications" className="hover:text-purple-400 transition-colors flex items-center space-x-2"><Bell className="w-4 h-4" /><span>4. Notifications</span></a></li>
-            <li><a href="#api" className="hover:text-purple-400 transition-colors flex items-center space-x-2"><Code className="w-4 h-4" /><span>5. API Reference</span></a></li>
-            <li><a href="#examples" className="hover:text-purple-400 transition-colors flex items-center space-x-2"><FileText className="w-4 h-4" /><span>6. Examples</span></a></li>
+            <li><a href="#kalshi" className="hover:text-purple-400 transition-colors flex items-center space-x-2"><TrendingUp className="w-4 h-4" /><span>2. Kalshi Prediction Markets</span></a></li>
+            <li><a href="#natural-language" className="hover:text-purple-400 transition-colors flex items-center space-x-2"><Code className="w-4 h-4" /><span>3. Natural Language Commands</span></a></li>
+            <li><a href="#features" className="hover:text-purple-400 transition-colors flex items-center space-x-2"><TrendingUp className="w-4 h-4" /><span>4. Features</span></a></li>
+            <li><a href="#notifications" className="hover:text-purple-400 transition-colors flex items-center space-x-2"><Bell className="w-4 h-4" /><span>5. Notifications</span></a></li>
+            <li><a href="#api" className="hover:text-purple-400 transition-colors flex items-center space-x-2"><Code className="w-4 h-4" /><span>6. API Reference</span></a></li>
+            <li><a href="#examples" className="hover:text-purple-400 transition-colors flex items-center space-x-2"><FileText className="w-4 h-4" /><span>7. Examples</span></a></li>
           </ul>
         </motion.div>
 
@@ -143,6 +144,77 @@ export default function DocsPage() {
           </div>
         </section>
 
+        {/* Kalshi Prediction Markets Section */}
+        <section id="kalshi" className="mb-16">
+          <motion.h2
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="text-3xl font-bold mb-6 text-purple-300 flex items-center space-x-3"
+          >
+            <TrendingUp className="w-8 h-8" />
+            <span>2. Kalshi Prediction Markets</span>
+          </motion.h2>
+          
+          <div className="space-y-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="p-6 bg-black/60 border border-purple-500/30 rounded-xl backdrop-blur-md shadow-xl"
+            >
+              <h3 className="text-xl font-semibold mb-4 text-blue-300">What is Kalshi?</h3>
+              <p className="text-gray-300 mb-4">
+                Eunoia is powered by Kalshi, a prediction market platform where you can bet on real-world events. 
+                Through Eunoia's natural language interface, you can search markets, place bets, and track your positions on Kalshi.
+              </p>
+              <div className="bg-black/80 p-4 rounded-lg border border-purple-500/20">
+                <p className="text-sm text-gray-400 mb-2">Example:</p>
+                <code className="text-purple-300 text-sm">"Show odds on inflation above 3%"</code>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="p-6 bg-black/60 border border-purple-500/30 rounded-xl backdrop-blur-md shadow-xl"
+            >
+              <h3 className="text-xl font-semibold mb-4 text-blue-300">Kalshi Commands</h3>
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-semibold text-purple-300 mb-2">Search Markets</h4>
+                  <p className="text-gray-300 mb-2">Find prediction markets by topic:</p>
+                  <ul className="list-disc list-inside text-gray-400 space-y-1 ml-4">
+                    <li>"Show odds on inflation above 3%"</li>
+                    <li>"What markets are available for elections?"</li>
+                    <li>"Search for weather markets"</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-purple-300 mb-2">Place Bets</h4>
+                  <p className="text-gray-300 mb-2">Bet on market outcomes:</p>
+                  <ul className="list-disc list-inside text-gray-400 space-y-1 ml-4">
+                    <li>"Bet 0.05 SOL yes on rain in NYC tomorrow"</li>
+                    <li>"Place a bet on inflation being above 3%"</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-purple-300 mb-2">Check Positions</h4>
+                  <p className="text-gray-300 mb-2">View your active bets:</p>
+                  <ul className="list-disc list-inside text-gray-400 space-y-1 ml-4">
+                    <li>"Check my Kalshi positions"</li>
+                    <li>"Show my active bets"</li>
+                  </ul>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
         {/* Natural Language Section */}
         <section id="natural-language" className="mb-16">
           <motion.h2
@@ -153,7 +225,7 @@ export default function DocsPage() {
             className="text-3xl font-bold mb-6 text-purple-300 flex items-center space-x-3"
           >
             <Code className="w-8 h-8" />
-            <span>2. Natural Language Commands</span>
+            <span>3. Natural Language Commands</span>
           </motion.h2>
           
           <div className="space-y-6">

@@ -1448,6 +1448,14 @@ ${new Date(tx.createdAt).toLocaleString()}
                                         priority
                                     />
                                 </div>
+                                <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ delay: 0.3, duration: 0.6 }}
+                                    className="text-xs text-green-400/60 font-light tracking-wider"
+                                >
+                                    Powered by Kalshi
+                                </motion.div>
                             </motion.div>
                         </div>
 

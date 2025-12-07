@@ -4,7 +4,7 @@ This document provides an overview of Eunoia's technical architecture and design
 
 ## System Overview
 
-Eunoia is a Next.js 15 application that provides an AI-powered interface for Solana blockchain operations. It combines natural language processing with blockchain interactions through a modern web interface.
+Eunoia is a Next.js 15 application that provides an AI-powered interface for Solana blockchain operations and Kalshi prediction markets. It combines natural language processing with blockchain interactions and prediction market trading through a modern web interface.
 
 ## Technology Stack
 
@@ -25,6 +25,9 @@ Eunoia is a Next.js 15 application that provides an AI-powered interface for Sol
 - **Solana Web3.js** - Solana blockchain interaction
 - **Jupiter Aggregator** - Token swap service
 - **Solana Name Service** - Domain resolution
+
+### Prediction Markets
+- **Kalshi API** - Prediction market platform integration
 
 ## Architecture Patterns
 

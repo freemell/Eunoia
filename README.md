@@ -5,7 +5,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
 [![Solana](https://img.shields.io/badge/Solana-Web3-purple)](https://solana.com/)
 
-Eunoia is a modern AI-powered Solana blockchain assistant with a cyber-matrix aesthetic. Built with Next.js, TypeScript, and Tailwind CSS, Eunoia enables natural language interactions with the Solana blockchain.
+Eunoia is a modern AI-powered Solana blockchain assistant with a cyber-matrix aesthetic. Built with Next.js, TypeScript, and Tailwind CSS, Eunoia enables natural language interactions with the Solana blockchain and Kalshi prediction markets.
 
 ## Features
 
@@ -15,6 +15,7 @@ Eunoia is a modern AI-powered Solana blockchain assistant with a cyber-matrix ae
 - 🔄 **Token Swaps** - Swap tokens using Jupiter aggregator
 - 📊 **Balance Checking** - Real-time SOL balance display
 - 🎯 **Limit Orders** - Set buy/sell orders based on market cap or price
+- 🎲 **Kalshi Integration** - Search markets, place bets, and track positions on Kalshi prediction markets
 - 🎨 **Modern UI** - Cyber-matrix animated background with Eunoia branding
 
 ## Tech Stack
@@ -25,6 +26,7 @@ Eunoia is a modern AI-powered Solana blockchain assistant with a cyber-matrix ae
 - **Blockchain**: Solana Web3.js
 - **Wallets**: Solana Wallet Adapter
 - **AI**: Groq API (Llama 3.1)
+- **Prediction Markets**: Kalshi API
 - **Animations**: Framer Motion
 
 ## Getting Started
@@ -92,6 +94,9 @@ src/
    - "What's my balance?"
    - "Swap 1 SOL for USDC"
    - "If BONK hits 50k mc, buy 0.1 SOL worth"
+   - "Show odds on inflation above 3%" (Kalshi)
+   - "Bet 0.05 SOL yes on rain in NYC tomorrow" (Kalshi)
+   - "Check my Kalshi positions"
 
 ## Branding
 
@@ -132,5 +137,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - [Solana](https://solana.com/) - The blockchain platform
 - [Jupiter](https://jup.ag/) - Token swap aggregator
+- [Kalshi](https://kalshi.com/) - Prediction markets platform
 - [Groq](https://groq.com/) - AI inference platform
 - [Next.js](https://nextjs.org/) - React framework
