@@ -880,16 +880,22 @@ export function AnimatedAIChat() {
                 const data = await response.json();
                 
                 if (data.success) {
-                    // Add AI response to chat (but skip if it's just JSON for kalshi_query - we'll show formatted results instead)
-                    if (data.action !== 'kalshi_query' || !data.params) {
+                    // For kalshi_query, skip showing the AI response text - we'll show formatted market cards instead
+                    if (data.action === 'kalshi_query') {
+                        // Don't show AI response for market queries - the formatted cards will be shown
+                    } else {
                         // Clean up response - remove raw JSON if present
                         let cleanResponse = data.response || '';
                         // Remove JSON objects from response if they exist
                         cleanResponse = cleanResponse.replace(/\{[\s\S]*?"action":\s*"kalshi_query"[\s\S]*?\}/g, '');
                         cleanResponse = cleanResponse.replace(/\(Please wait for the response\)/gi, '');
+                        // Remove common AI-generated market lists
+                        cleanResponse = cleanResponse.replace(/Here are the current markets on Kalshi:[\s\S]*?Would you like to place a bet/gi, '');
+                        cleanResponse = cleanResponse.replace(/\d+\.\s*\*\*[^*]+\*\*:[\s\S]*?\?/g, ''); // Remove numbered market lists
+                        cleanResponse = cleanResponse.replace(/Please note that these markets[\s\S]*?accurate information\./gi, '');
                         cleanResponse = cleanResponse.trim();
                         
-                        if (cleanResponse && cleanResponse.length > 0) {
+                        if (cleanResponse && cleanResponse.length > 0 && !cleanResponse.match(/^(I'm checking|Searching|Let me find)/i)) {
                             setMessages(prev => [...prev, { role: 'assistant', content: cleanResponse }]);
                         }
                     }
@@ -957,9 +963,12 @@ export function AnimatedAIChat() {
                                  const markets = kalshiData.markets.slice(0, 10);
                                  const marketsHtml = `
 <div style="margin: 16px 0; padding: 0;">
-    <div style="margin-bottom: 16px; padding: 12px; background: rgba(0, 255, 65, 0.1); border-radius: 8px; border-left: 3px solid #00ff41;">
-        <div style="font-size: 16px; font-weight: 600; color: #00ff41; margin-bottom: 4px;">📊 Found ${markets.length} Market${markets.length > 1 ? 's' : ''}</div>
-        <div style="font-size: 12px; color: #9ca3af;">Search: "${query}"</div>
+    <div style="margin-bottom: 20px; padding: 16px; background: linear-gradient(135deg, rgba(0, 255, 65, 0.15) 0%, rgba(0, 255, 65, 0.05) 100%); border-radius: 10px; border: 1px solid rgba(0, 255, 65, 0.3); box-shadow: 0 4px 12px rgba(0, 255, 65, 0.1);">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+            <div style="font-size: 18px;">📊</div>
+            <div style="font-size: 18px; font-weight: 700; color: #00ff41; text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);">Found ${markets.length} Market${markets.length > 1 ? 's' : ''}</div>
+        </div>
+        <div style="font-size: 13px; color: #9ca3af; font-style: italic;">Search: "${query}"</div>
     </div>
     ${markets.map((market: any, index: number) => {
         const yesPrice = market.yes_bid || market.yes_ask || 0;
