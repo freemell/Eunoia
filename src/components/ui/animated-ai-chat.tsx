@@ -971,6 +971,7 @@ export function AnimatedAIChat() {
                                  role: 'assistant',
                                  content: `<div style="padding: 16px; background: rgba(0, 255, 65, 0.1); border-radius: 8px; border: 1px solid rgba(0, 255, 65, 0.3);">
                                      <div style="display: flex; align-items: center; gap: 12px;">
+                                         <img src="/kalshi.png" alt="Kalshi" style="width: 24px; height: 24px; object-fit: contain;" />
                                          <div style="width: 20px; height: 20px; border: 2px solid rgba(0, 255, 65, 0.3); border-top-color: #00ff41; border-radius: 50%; animation: spin 1s linear infinite;"></div>
                                          <div style="color: #00ff41; font-weight: 500;">Searching Kalshi markets...</div>
                                      </div>
@@ -1005,8 +1006,8 @@ export function AnimatedAIChat() {
                                  const marketsHtml = `
 <div style="margin: 16px 0; padding: 0;">
     <div style="margin-bottom: 20px; padding: 16px; background: linear-gradient(135deg, rgba(0, 255, 65, 0.15) 0%, rgba(0, 255, 65, 0.05) 100%); border-radius: 10px; border: 1px solid rgba(0, 255, 65, 0.3); box-shadow: 0 4px 12px rgba(0, 255, 65, 0.1);">
-        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-            <div style="font-size: 18px;">📊</div>
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+            <img src="/kalshi.png" alt="Kalshi" style="width: 32px; height: 32px; object-fit: contain;" />
             <div style="font-size: 18px; font-weight: 700; color: #00ff41; text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);">Found ${markets.length} Market${markets.length > 1 ? 's' : ''}</div>
         </div>
         <div style="font-size: 13px; color: #9ca3af; font-style: italic;">Search: "${query}"</div>
@@ -1068,7 +1069,7 @@ export function AnimatedAIChat() {
 <div style="margin: 16px 0; padding: 0;">
     <div style="padding: 24px; background: linear-gradient(135deg, rgba(0, 255, 65, 0.1) 0%, rgba(0, 255, 65, 0.05) 100%); border-radius: 10px; border: 1px solid rgba(0, 255, 65, 0.3); box-shadow: 0 4px 12px rgba(0, 255, 65, 0.1);">
         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
-            <div style="font-size: 24px;">🔍</div>
+            <img src="/kalshi.png" alt="Kalshi" style="width: 32px; height: 32px; object-fit: contain;" />
             <div style="font-size: 18px; font-weight: 700; color: #00ff41; text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);">No Markets Found</div>
         </div>
         <div style="color: #e5e7eb; margin-bottom: 16px; line-height: 1.6;">
@@ -1113,7 +1114,7 @@ export function AnimatedAIChat() {
 <div style="margin: 16px 0; padding: 0;">
     <div style="padding: 24px; background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%); border-radius: 10px; border: 1px solid rgba(239, 68, 68, 0.3); box-shadow: 0 4px 12px rgba(239, 68, 68, 0.1);">
         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
-            <div style="font-size: 24px;">⚠️</div>
+            <img src="/kalshi.png" alt="Kalshi" style="width: 32px; height: 32px; object-fit: contain; opacity: 0.7;" />
             <div style="font-size: 18px; font-weight: 700; color: #ef4444; text-shadow: 0 0 10px rgba(239, 68, 68, 0.5);">Unable to Search Markets</div>
         </div>
         <div style="color: #e5e7eb; margin-bottom: 16px; line-height: 1.6;">
@@ -1151,7 +1152,10 @@ export function AnimatedAIChat() {
                                  setMessages(prev => [...prev, {
                                      role: 'assistant',
                                      content: `<div style="padding: 16px; background: rgba(239, 68, 68, 0.1); border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.3);">
-                                         <div style="color: #ef4444; font-weight: 600; margin-bottom: 8px;">⚠️ Wallet Not Connected</div>
+                                         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                                             <img src="/kalshi.png" alt="Kalshi" style="width: 24px; height: 24px; object-fit: contain;" />
+                                             <div style="color: #ef4444; font-weight: 600;">⚠️ Wallet Not Connected</div>
+                                         </div>
                                          <div style="color: #e5e7eb; margin-bottom: 12px;">Please connect your wallet to place bets on Kalshi markets.</div>
                                          <div style="color: #9ca3af; font-size: 12px;">Click the wallet button in the top right to connect.</div>
                                      </div>`
@@ -1215,7 +1219,10 @@ export function AnimatedAIChat() {
                              setMessages(prev => [...prev, {
                                  role: 'assistant',
                                  content: `<div style="padding: 16px; background: rgba(0, 255, 65, 0.1); border-radius: 8px; border: 1px solid rgba(0, 255, 65, 0.3);">
-                                     <div style="color: #00ff41; font-weight: 600; margin-bottom: 8px;">🔗 Connect Wallet</div>
+                                     <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                                         <img src="/kalshi.png" alt="Kalshi" style="width: 24px; height: 24px; object-fit: contain;" />
+                                         <div style="color: #00ff41; font-weight: 600;">🔗 Connect Wallet</div>
+                                     </div>
                                      <div style="color: #e5e7eb; margin-bottom: 12px;">Please connect your wallet to view your Kalshi positions.</div>
                                      <div style="color: #9ca3af; font-size: 12px;">Click the wallet button in the top right to connect.</div>
                                  </div>`
@@ -1236,15 +1243,23 @@ export function AnimatedAIChat() {
                                      </div>`;
                                  }).join('');
                                  
+                                 const positionsHeader = `
+<div style="margin-bottom: 16px; padding: 16px; background: linear-gradient(135deg, rgba(0, 255, 65, 0.15) 0%, rgba(0, 255, 65, 0.05) 100%); border-radius: 10px; border: 1px solid rgba(0, 255, 65, 0.3);">
+    <div style="display: flex; align-items: center; gap: 12px;">
+        <img src="/kalshi.png" alt="Kalshi" style="width: 32px; height: 32px; object-fit: contain;" />
+        <div style="font-size: 18px; font-weight: 700; color: #00ff41; text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);">Your Kalshi Positions</div>
+    </div>
+</div>`;
+                                 
                                  setMessages(prev => [...prev, {
                                      role: 'assistant',
-                                     content: `📊 **Your Kalshi Positions:**\n\n${positionsHtml}`
+                                     content: positionsHeader + positionsHtml
                                  }]);
                              } else {
                                  const noPositionsHtml = `
 <div style="padding: 24px; background: linear-gradient(135deg, rgba(0, 255, 65, 0.1) 0%, rgba(0, 255, 65, 0.05) 100%); border-radius: 10px; border: 1px solid rgba(0, 255, 65, 0.3); box-shadow: 0 4px 12px rgba(0, 255, 65, 0.1);">
     <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
-        <div style="font-size: 24px;">📊</div>
+        <img src="/kalshi.png" alt="Kalshi" style="width: 32px; height: 32px; object-fit: contain;" />
         <div style="font-size: 18px; font-weight: 700; color: #00ff41; text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);">No Active Positions</div>
     </div>
     <div style="color: #e5e7eb; margin-bottom: 16px; line-height: 1.6;">
@@ -1269,7 +1284,7 @@ export function AnimatedAIChat() {
                              const noPositionsHtml = `
 <div style="padding: 24px; background: linear-gradient(135deg, rgba(0, 255, 65, 0.1) 0%, rgba(0, 255, 65, 0.05) 100%); border-radius: 10px; border: 1px solid rgba(0, 255, 65, 0.3); box-shadow: 0 4px 12px rgba(0, 255, 65, 0.1);">
     <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
-        <div style="font-size: 24px;">📊</div>
+        <img src="/kalshi.png" alt="Kalshi" style="width: 32px; height: 32px; object-fit: contain;" />
         <div style="font-size: 18px; font-weight: 700; color: #00ff41; text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);">No Active Positions</div>
     </div>
     <div style="color: #e5e7eb; margin-bottom: 16px; line-height: 1.6;">
@@ -1537,9 +1552,15 @@ ${new Date(tx.createdAt).toLocaleString()}
                             className="bg-gradient-to-br from-black/95 to-black/90 border border-green-500/30 rounded-2xl p-6 max-w-md w-full shadow-2xl shadow-green-500/20"
                         >
                             <div className="flex items-center justify-between mb-6">
-                                <h3 className="text-2xl font-bold text-white flex items-center gap-2">
-                                    <span className="text-green-400">🎲</span>
-                                    Confirm Bet
+                                <h3 className="text-2xl font-bold text-white flex items-center gap-3">
+                                    <Image 
+                                        src="/kalshi.png" 
+                                        alt="Kalshi" 
+                                        width={32} 
+                                        height={32} 
+                                        className="object-contain"
+                                    />
+                                    <span>Confirm Bet</span>
                                 </h3>
                                 <button
                                     onClick={() => {
