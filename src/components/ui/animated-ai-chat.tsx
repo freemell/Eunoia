@@ -183,6 +183,7 @@ export function AnimatedAIChat() {
         amount: number;
         amount_token: string;
     } | null>(null);
+    const [betAmount, setBetAmount] = useState<string>('');
     // Removed textareaRef since we're using OrbInput now
 
     // Auto-scroll chat container
@@ -1198,6 +1199,7 @@ export function AnimatedAIChat() {
                                  amount: parseFloat(amount.toString()),
                                  amount_token: amount_token || 'SOL',
                              });
+                             setBetAmount(amount.toString()); // Pre-fill with suggested amount
                              setShowBetModal(true);
                              
                          } catch (error) {
@@ -1521,7 +1523,11 @@ ${new Date(tx.createdAt).toLocaleString()}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-                        onClick={() => setShowBetModal(false)}
+                        onClick={() => {
+                            setShowBetModal(false);
+                            setPendingBet(null);
+                            setBetAmount('');
+                        }}
                     >
                         <motion.div
                             initial={{ scale: 0.9, opacity: 0 }}
@@ -1536,7 +1542,11 @@ ${new Date(tx.createdAt).toLocaleString()}
                                     Confirm Bet
                                 </h3>
                                 <button
-                                    onClick={() => setShowBetModal(false)}
+                                    onClick={() => {
+                                        setShowBetModal(false);
+                                        setPendingBet(null);
+                                        setBetAmount('');
+                                    }}
                                     className="text-white/60 hover:text-white transition-colors"
                                 >
                                     ✕
@@ -1549,33 +1559,36 @@ ${new Date(tx.createdAt).toLocaleString()}
                                     <div className="text-white font-semibold">{pendingBet.market.title || pendingBet.market.ticker}</div>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="bg-black/40 border border-green-500/20 rounded-xl p-4">
-                                        <div className="text-sm text-white/60 mb-2">Side</div>
-                                        <div className={`text-lg font-bold ${pendingBet.side === 'yes' ? 'text-green-400' : 'text-red-400'}`}>
-                                            {pendingBet.side.toUpperCase()}
-                                        </div>
-                                    </div>
-                                    <div className="bg-black/40 border border-green-500/20 rounded-xl p-4">
-                                        <div className="text-sm text-white/60 mb-2">Amount</div>
-                                        <div className="text-white font-semibold text-lg">
-                                            {pendingBet.amount} {pendingBet.amount_token}
-                                        </div>
+                                <div className="bg-black/40 border border-green-500/20 rounded-xl p-4">
+                                    <div className="text-sm text-white/60 mb-2">Side</div>
+                                    <div className={`text-lg font-bold ${pendingBet.side === 'yes' ? 'text-green-400' : 'text-red-400'}`}>
+                                        {pendingBet.side.toUpperCase()}
                                     </div>
                                 </div>
 
-                                <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4">
-                                    <div className="text-xs text-yellow-400 mb-1">⚠️ Important</div>
-                                    <div className="text-xs text-white/80">
-                                        Your SOL will be sent to the system wallet and held pending the market result. 
-                                        Funds will be returned or paid out based on the outcome.
-                                    </div>
-                                </div>
-
-                                <div className="bg-black/40 border border-green-500/20 rounded-xl p-3">
-                                    <div className="text-xs text-white/60 mb-1">System Wallet</div>
-                                    <div className="text-green-400 font-mono text-xs break-all">
-                                        FrdZwarp15AovECKswShBZXxeqtjnZYEJYAKcJ28VQxR
+                                <div className="bg-black/40 border border-green-500/20 rounded-xl p-4">
+                                    <div className="text-sm text-white/60 mb-3">Bet Amount (SOL)</div>
+                                    <div className="relative">
+                                        <input
+                                            type="number"
+                                            step="0.01"
+                                            min="0.01"
+                                            value={betAmount}
+                                            onChange={(e) => setBetAmount(e.target.value)}
+                                            placeholder="Enter amount"
+                                            className="w-full px-4 py-3 bg-black/60 border border-green-500/30 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all font-mono"
+                                        />
+                                        {balance !== null && (
+                                            <div className="mt-2 flex items-center justify-between text-xs">
+                                                <span className="text-white/60">Available: {balance.toFixed(4)} SOL</span>
+                                                <button
+                                                    onClick={() => setBetAmount(balance.toFixed(4))}
+                                                    className="text-green-400 hover:text-green-300 transition-colors underline"
+                                                >
+                                                    Use Max
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -1585,6 +1598,7 @@ ${new Date(tx.createdAt).toLocaleString()}
                                     onClick={() => {
                                         setShowBetModal(false);
                                         setPendingBet(null);
+                                        setBetAmount('');
                                     }}
                                     className="flex-1 px-4 py-3 bg-black/60 hover:bg-black/80 border border-white/20 text-white rounded-xl transition-colors font-medium"
                                 >
@@ -1601,13 +1615,31 @@ ${new Date(tx.createdAt).toLocaleString()}
                                             return;
                                         }
 
+                                        // Validate bet amount
+                                        const amount = parseFloat(betAmount);
+                                        if (isNaN(amount) || amount <= 0) {
+                                            setMessages(prev => [...prev, {
+                                                role: 'assistant',
+                                                content: 'Please enter a valid bet amount.'
+                                            }]);
+                                            return;
+                                        }
+
+                                        if (balance !== null && amount > balance) {
+                                            setMessages(prev => [...prev, {
+                                                role: 'assistant',
+                                                content: `Insufficient balance. You have ${balance.toFixed(4)} SOL.`
+                                            }]);
+                                            return;
+                                        }
+
                                         try {
                                             setIsProcessing(true);
                                             setShowBetModal(false);
 
                                             // Send SOL to system wallet
                                             const systemWallet = new PublicKey('FrdZwarp15AovECKswShBZXxeqtjnZYEJYAKcJ28VQxR');
-                                            const amountInLamports = Math.floor(pendingBet.amount * LAMPORTS_PER_SOL);
+                                            const amountInLamports = Math.floor(amount * LAMPORTS_PER_SOL);
 
                                             const transaction = new Transaction().add(
                                                 SystemProgram.transfer({
@@ -1627,13 +1659,10 @@ ${new Date(tx.createdAt).toLocaleString()}
                                                     <div style="color: #e5e7eb; margin-bottom: 8px;">
                                                         <div><strong>Market:</strong> ${pendingBet.market.title || pendingBet.market.ticker}</div>
                                                         <div><strong>Side:</strong> ${pendingBet.side.toUpperCase()}</div>
-                                                        <div><strong>Amount:</strong> ${pendingBet.amount} ${pendingBet.amount_token}</div>
+                                                        <div><strong>Amount:</strong> ${amount} SOL</div>
                                                     </div>
                                                     <div style="color: #9ca3af; font-size: 12px; margin-top: 8px;">
                                                         Transaction: <span style="color: #00ff41; font-family: monospace;">${signature.slice(0, 8)}...${signature.slice(-8)}</span>
-                                                    </div>
-                                                    <div style="color: #9ca3af; font-size: 11px; margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(0, 255, 65, 0.2);">
-                                                        Your SOL has been sent to the system wallet. You'll receive your payout when the market resolves.
                                                     </div>
                                                 </div>`
                                             }]);
