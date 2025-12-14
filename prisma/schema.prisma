@@ -89,3 +89,27 @@ model LimitOrder {
   @@index([tokenAddress])
   @@index([createdAt])
 }
+
+model KalshiBet {
+  id            String   @id @default(cuid())
+  walletAddress String   // User's wallet address
+  userId        String?  // Optional user ID for web users
+  telegramId    String?  // Optional Telegram user ID
+  marketTicker  String   // Kalshi market ticker
+  marketTitle   String   // Market title/description
+  side          String   // 'yes' or 'no'
+  amount        String   // Amount bet in SOL
+  entryPrice    Float    // Entry price (odds when bet was placed, 0-100)
+  currentPrice  Float    // Current price (odds now, 0-100)
+  currentValue  Float    // Current value in SOL (calculated from current price)
+  txHash        String?  // Transaction hash
+  status        String   @default("active") // 'active', 'won', 'lost', 'settled'
+  marketData    String?  // JSON string of full market data
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([walletAddress])
+  @@index([status])
+  @@index([marketTicker])
+  @@index([createdAt])
+}

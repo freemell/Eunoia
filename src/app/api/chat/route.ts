@@ -33,6 +33,7 @@ Parse user queries into structured actions. Available actions:
 - kalshi_query: Search or query Kalshi markets (requires query or event)
 - kalshi_bet: Place a bet on Kalshi (requires event, side: "yes" or "no", amount)
 - kalshi_positions: Check user's Kalshi positions
+- kalshi_active_bets: Show user's active Kalshi bets (no params needed)
 - kalshi_redeem: Redeem winnings from settled markets (requires event or ticker)
 - kalshi_limit: Create a limit order on Kalshi (requires event, condition, side, amount)
 
@@ -82,6 +83,7 @@ KALSHI OPERATIONS:
   **CRITICAL**: For kalshi_query actions, your response should ONLY acknowledge the query briefly (e.g., "Searching Kalshi markets..." or "Let me find those markets for you."). DO NOT list or make up market data - the system will fetch and display real market data from the Kalshi API automatically.
 - kalshi_bet: Place a bet. Example: "Bet 0.05 SOL yes on rain in NYC tomorrow" → {"action": "kalshi_bet", "params": {"event": "rain in NYC tomorrow", "side": "yes", "amount": 0.05, "amount_token": "SOL"}}
 - kalshi_positions: Check positions. Example: "Check my Kalshi positions" → {"action": "kalshi_positions", "params": {}}
+- kalshi_active_bets: Show active bets. Examples: "Show my active bets", "What are my open bets?", "List my Kalshi bets" → {"action": "kalshi_active_bets", "params": {}}
 - kalshi_redeem: Redeem winnings. Example: "Redeem winnings from election market" → {"action": "kalshi_redeem", "params": {"event": "election market"}}
 - kalshi_limit: Create limit order. Example: "If yes price on event X below 0.50, buy 0.1 SOL" → {"action": "kalshi_limit", "params": {"event": "X", "condition": "yes_price < 0.50", "side": "buy_yes", "amount": 0.1, "amount_token": "SOL"}}
 

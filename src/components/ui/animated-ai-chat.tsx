@@ -1298,6 +1298,143 @@ export function AnimatedAIChat() {
                                  content: noPositionsHtml
                              }]);
                          }
+                     } else if (data.action === 'kalshi_active_bets') {
+                         // Check if wallet is connected
+                         if (!connected || !publicKey) {
+                             setMessages(prev => [...prev, {
+                                 role: 'assistant',
+                                 content: `<div style="padding: 16px; background: rgba(0, 255, 65, 0.1); border-radius: 8px; border: 1px solid rgba(0, 255, 65, 0.3);">
+                                     <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                                         <img src="/kalshi.png" alt="Kalshi" style="width: 24px; height: 24px; object-fit: contain;" />
+                                         <div style="color: #00ff41; font-weight: 600;">🔗 Connect Wallet</div>
+                                     </div>
+                                     <div style="color: #e5e7eb; margin-bottom: 12px;">Please connect your wallet to view your active bets.</div>
+                                     <div style="color: #9ca3af; font-size: 12px;">Click the wallet button in the top right to connect.</div>
+                                 </div>`
+                             }]);
+                             return;
+                         }
+                         
+                         try {
+                             const betsResponse = await fetch(`/api/kalshi/bets?walletAddress=${publicKey.toString()}&status=active`);
+                             const betsData = await betsResponse.json();
+                             
+                             if (betsData.success && betsData.bets && betsData.bets.length > 0) {
+                                 const bets = betsData.bets;
+                                 const totalValue = bets.reduce((sum: number, bet: any) => sum + bet.currentValue, 0);
+                                 const totalInvested = bets.reduce((sum: number, bet: any) => sum + parseFloat(bet.amount), 0);
+                                 const totalPnL = totalValue - totalInvested;
+                                 
+                                 const betsHtml = bets.map((bet: any) => {
+                                     const pnl = bet.currentValue - parseFloat(bet.amount);
+                                     const pnlPercent = ((pnl / parseFloat(bet.amount)) * 100).toFixed(2);
+                                     const priceChange = bet.currentPrice - bet.entryPrice;
+                                     const priceChangePercent = ((priceChange / bet.entryPrice) * 100).toFixed(2);
+                                     
+                                     return `<div style="margin: 12px 0; padding: 16px; background: rgba(0, 255, 65, 0.1); border-radius: 8px; border: 1px solid rgba(0, 255, 65, 0.3);">
+                                         <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                                             <div style="flex: 1;">
+                                                 <div style="font-weight: 700; color: #00ff41; font-size: 16px; margin-bottom: 4px;">${bet.marketTitle}</div>
+                                                 <div style="font-size: 12px; color: #9ca3af;">${bet.marketTicker}</div>
+                                             </div>
+                                             <div style="padding: 6px 12px; background: ${bet.side === 'yes' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)'}; border-radius: 6px; border: 1px solid ${bet.side === 'yes' ? 'rgba(16, 185, 129, 0.4)' : 'rgba(239, 68, 68, 0.4)'};">
+                                                 <div style="font-weight: 700; color: ${bet.side === 'yes' ? '#10b981' : '#ef4444'}; font-size: 14px;">${bet.side.toUpperCase()}</div>
+                                             </div>
+                                         </div>
+                                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                                             <div style="padding: 8px; background: rgba(0, 0, 0, 0.3); border-radius: 6px;">
+                                                 <div style="font-size: 11px; color: #9ca3af; margin-bottom: 4px;">Amount Bet</div>
+                                                 <div style="font-size: 16px; font-weight: 600; color: #f59e0b;">${parseFloat(bet.amount).toFixed(4)} SOL</div>
+                                             </div>
+                                             <div style="padding: 8px; background: rgba(0, 0, 0, 0.3); border-radius: 6px;">
+                                                 <div style="font-size: 11px; color: #9ca3af; margin-bottom: 4px;">Current Value</div>
+                                                 <div style="font-size: 16px; font-weight: 600; color: ${bet.currentValue >= parseFloat(bet.amount) ? '#10b981' : '#ef4444'};">${bet.currentValue.toFixed(4)} SOL</div>
+                                             </div>
+                                             <div style="padding: 8px; background: rgba(0, 0, 0, 0.3); border-radius: 6px;">
+                                                 <div style="font-size: 11px; color: #9ca3af; margin-bottom: 4px;">Entry Price</div>
+                                                 <div style="font-size: 14px; font-weight: 500; color: #e5e7eb;">${bet.entryPrice.toFixed(2)}%</div>
+                                             </div>
+                                             <div style="padding: 8px; background: rgba(0, 0, 0, 0.3); border-radius: 6px;">
+                                                 <div style="font-size: 11px; color: #9ca3af; margin-bottom: 4px;">Current Price</div>
+                                                 <div style="font-size: 14px; font-weight: 500; color: ${priceChange >= 0 ? '#10b981' : '#ef4444'};">${bet.currentPrice.toFixed(2)}% <span style="font-size: 11px;">(${priceChange >= 0 ? '+' : ''}${priceChangePercent}%)</span></div>
+                                             </div>
+                                         </div>
+                                         <div style="padding: 10px; background: rgba(0, 0, 0, 0.4); border-radius: 6px; border-left: 3px solid ${pnl >= 0 ? '#10b981' : '#ef4444'};">
+                                             <div style="display: flex; justify-content: space-between; align-items: center;">
+                                                 <div style="font-size: 12px; color: #9ca3af;">P&L</div>
+                                                 <div style="font-size: 18px; font-weight: 700; color: ${pnl >= 0 ? '#10b981' : '#ef4444'};">${pnl >= 0 ? '+' : ''}${pnl.toFixed(4)} SOL <span style="font-size: 14px;">(${pnlPercent >= 0 ? '+' : ''}${pnlPercent}%)</span></div>
+                                             </div>
+                                         </div>
+                                     </div>`;
+                                 }).join('');
+                                 
+                                 const betsHeader = `
+<div style="margin-bottom: 16px; padding: 20px; background: linear-gradient(135deg, rgba(0, 255, 65, 0.15) 0%, rgba(0, 255, 65, 0.05) 100%); border-radius: 10px; border: 1px solid rgba(0, 255, 65, 0.3);">
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+        <img src="/kalshi.png" alt="Kalshi" style="width: 32px; height: 32px; object-fit: contain;" />
+        <div style="font-size: 20px; font-weight: 700; color: #00ff41; text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);">Your Active Bets</div>
+    </div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 12px;">
+        <div style="padding: 12px; background: rgba(0, 0, 0, 0.3); border-radius: 8px;">
+            <div style="font-size: 11px; color: #9ca3af; margin-bottom: 4px;">Total Invested</div>
+            <div style="font-size: 18px; font-weight: 700; color: #f59e0b;">${totalInvested.toFixed(4)} SOL</div>
+        </div>
+        <div style="padding: 12px; background: rgba(0, 0, 0, 0.3); border-radius: 8px;">
+            <div style="font-size: 11px; color: #9ca3af; margin-bottom: 4px;">Current Value</div>
+            <div style="font-size: 18px; font-weight: 700; color: ${totalValue >= totalInvested ? '#10b981' : '#ef4444'};">${totalValue.toFixed(4)} SOL</div>
+        </div>
+        <div style="padding: 12px; background: rgba(0, 0, 0, 0.3); border-radius: 8px;">
+            <div style="font-size: 11px; color: #9ca3af; margin-bottom: 4px;">Total P&L</div>
+            <div style="font-size: 18px; font-weight: 700; color: ${totalPnL >= 0 ? '#10b981' : '#ef4444'};">${totalPnL >= 0 ? '+' : ''}${totalPnL.toFixed(4)} SOL</div>
+        </div>
+    </div>
+</div>`;
+                                 
+                                 setMessages(prev => [...prev, {
+                                     role: 'assistant',
+                                     content: betsHeader + betsHtml
+                                 }]);
+                             } else {
+                                 const noBetsHtml = `
+<div style="padding: 24px; background: linear-gradient(135deg, rgba(0, 255, 65, 0.1) 0%, rgba(0, 255, 65, 0.05) 100%); border-radius: 10px; border: 1px solid rgba(0, 255, 65, 0.3); box-shadow: 0 4px 12px rgba(0, 255, 65, 0.1);">
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+        <img src="/kalshi.png" alt="Kalshi" style="width: 32px; height: 32px; object-fit: contain;" />
+        <div style="font-size: 18px; font-weight: 700; color: #00ff41; text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);">No Active Bets</div>
+    </div>
+    <div style="color: #e5e7eb; margin-bottom: 16px; line-height: 1.6;">
+        <p style="margin-bottom: 12px;">You currently have no active bets on Kalshi.</p>
+        <p style="margin-bottom: 0;">Start betting by searching for markets and placing bets!</p>
+    </div>
+    <div style="padding: 12px; background: rgba(0, 255, 65, 0.05); border-radius: 6px; border: 1px dashed rgba(0, 255, 65, 0.3);">
+        <div style="font-size: 12px; color: #9ca3af; text-align: center;">
+            💡 <span style="color: #00ff41;">Tip:</span> Say "Show odds on [topic]" to find markets, then "Bet [amount] SOL yes/no on [market]"
+        </div>
+    </div>
+</div>`;
+                                 
+                                 setMessages(prev => [...prev, {
+                                     role: 'assistant',
+                                     content: noBetsHtml
+                                 }]);
+                             }
+                         } catch (error) {
+                             console.error('Kalshi active bets error:', error);
+                             const noBetsHtml = `
+<div style="padding: 24px; background: linear-gradient(135deg, rgba(0, 255, 65, 0.1) 0%, rgba(0, 255, 65, 0.05) 100%); border-radius: 10px; border: 1px solid rgba(0, 255, 65, 0.3); box-shadow: 0 4px 12px rgba(0, 255, 65, 0.1);">
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+        <img src="/kalshi.png" alt="Kalshi" style="width: 32px; height: 32px; object-fit: contain;" />
+        <div style="font-size: 18px; font-weight: 700; color: #00ff41; text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);">No Active Bets</div>
+    </div>
+    <div style="color: #e5e7eb; margin-bottom: 16px; line-height: 1.6;">
+        <p style="margin-bottom: 12px;">You currently have no active bets on Kalshi.</p>
+    </div>
+</div>`;
+                             
+                             setMessages(prev => [...prev, {
+                                 role: 'assistant',
+                                 content: noBetsHtml
+                             }]);
+                         }
                      } else if (data.action === 'history' && publicKey) {
                          try {
                              const historyResponse = await fetch(`/api/transactions/simple-history?walletAddress=${publicKey.toString()}&limit=20`);
@@ -1673,6 +1810,32 @@ ${new Date(tx.createdAt).toLocaleString()}
                                             const signature = await sendTransaction(transaction, connection);
                                             await connection.confirmTransaction(signature, 'confirmed');
 
+                                            // Calculate entry price from market data
+                                            const entryPrice = pendingBet.side === 'yes' 
+                                                ? (pendingBet.market.yes_bid || pendingBet.market.yes_ask || 50)
+                                                : (pendingBet.market.no_bid || pendingBet.market.no_ask || 50);
+
+                                            // Save bet to database
+                                            try {
+                                                await fetch('/api/kalshi/bets', {
+                                                    method: 'POST',
+                                                    headers: { 'Content-Type': 'application/json' },
+                                                    body: JSON.stringify({
+                                                        walletAddress: publicKey.toString(),
+                                                        marketTicker: pendingBet.market.ticker || pendingBet.market.event_ticker || 'UNKNOWN',
+                                                        marketTitle: pendingBet.market.title || pendingBet.market.ticker,
+                                                        side: pendingBet.side,
+                                                        amount: amount.toString(),
+                                                        entryPrice: entryPrice,
+                                                        txHash: signature,
+                                                        marketData: pendingBet.market,
+                                                    }),
+                                                });
+                                            } catch (dbError) {
+                                                console.error('Failed to save bet to database:', dbError);
+                                                // Continue even if database save fails
+                                            }
+
                                             setMessages(prev => [...prev, {
                                                 role: 'assistant',
                                                 content: `<div style="padding: 16px; background: rgba(0, 255, 65, 0.1); border-radius: 8px; border: 1px solid rgba(0, 255, 65, 0.3);">
@@ -1874,15 +2037,15 @@ ${new Date(tx.createdAt).toLocaleString()}
                                         priority
                                     />
                                 </div>
-                                <motion.div
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
+                            <motion.div
+                                 initial={{ opacity: 0 }}
+                                 animate={{ opacity: 1 }}
                                     transition={{ delay: 0.3, duration: 0.6 }}
                                     className="text-xs text-green-400/60 font-light tracking-wider"
-                                >
+                                 >
                                     Powered by Kalshi
-                                </motion.div>
-                            </motion.div>
+                                 </motion.div>
+                             </motion.div>
                         </div>
 
                         {/* Input Area for Initial State */}

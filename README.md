@@ -55,7 +55,7 @@ Create a `.env.local` file in the root directory:
 ```env
 GROQ_API_KEY=your_groq_api_key
 NEXT_PUBLIC_SOLANA_RPC_URL=https://api.mainnet-beta.solana.com
-DATABASE_URL=file:./dev.db
+   DATABASE_URL=file:./dev.db
 ```
 
 4. Run the development server:
