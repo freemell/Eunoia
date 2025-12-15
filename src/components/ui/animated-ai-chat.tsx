@@ -2305,6 +2305,17 @@ ${new Date(tx.createdAt).toLocaleString()}
                             <FileText className="w-4 h-4" />
                             <span className="text-sm">Documentation</span>
                         </a>
+
+                        {/* CA Address */}
+                        <a
+                            href={`https://solscan.io/token/HpEosJtMTFSuj6qQHwLw5Myrgq9AvAqK1cEFYHjWpump`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center space-x-2 text-white/70 hover:text-white transition-colors duration-200"
+                            title="View on Solscan"
+                        >
+                            <span className="text-sm font-mono">HpEosJtMTFSuj6qQHwLw5Myrgq9AvAqK1cEFYHjWpump</span>
+                        </a>
                     </div>
                 </div>
             </footer>
